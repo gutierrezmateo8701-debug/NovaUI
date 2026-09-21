@@ -1,16 +1,15 @@
 --[[
-    NovaUI Library - Creado desde cero
-    Sintaxis limpia y moderna
+    NovaUI Library - Corregido y optimizado para ejecutores
 ]]
 
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 
 local NovaUI = {}
-NovaUI.__index = visuals or {}
 
--- Función para animaciones rápidas
 local function tween(object, info, goals)
 	local t = TweenService:Create(object, TweenInfo.new(info, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), goals)
 	t:Play()
@@ -21,25 +20,34 @@ function NovaUI:Create(config)
 	config = config or {}
 	local titleText = config.Name or "NovaUI Hub"
 	
+	-- Limpiar instancias anteriores si existen para evitar duplicados invisibles
+	if LocalPlayer.PlayerGui:FindFirstChild("NovaUI_Main") then
+		LocalPlayer.PlayerGui.NovaUI_Main:Destroy()
+	end
+	if CoreGui:FindFirstChild("NovaUI_Main") then
+		CoreGui.NovaUI_Main:Destroy()
+	end
+
 	-- ScreenGui Principal
 	local ScreenGui = Instance.new("ScreenGui")
 	ScreenGui.Name = "NovaUI_Main"
 	ScreenGui.ResetOnSpawn = false
 	
-	-- Protección para ejecutores si está disponible
-	if syn and syn.protect_gui then
-		syn.protect_gui(ScreenGui)
-		ScreenGui.Parent = CoreGui
-	else
-		pcall(function()
+	-- Intentar parentar de forma segura
+	local success = pcall(function()
+		if syn and syn.protect_gui then
+			syn.protect_gui(ScreenGui)
 			ScreenGui.Parent = CoreGui
-		end)
-	end
-	if not ScreenGui.Parent then
-		ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+		else
+			ScreenGui.Parent = CoreGui
+		end
+	end)
+	
+	if not success or not ScreenGui.Parent then
+		ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 	end
 
-	-- Botón flotante cuando está minimizado (Gui chica / "UI" Izquierda)
+	-- Botón flotante minimizado (Gui chica / "UI" Izquierda)
 	local MiniButton = Instance.new("TextButton")
 	MiniButton.Name = "MiniButton"
 	MiniButton.Size = UDim2.new(0, 50, 0, 50)
@@ -50,6 +58,7 @@ function NovaUI:Create(config)
 	MiniButton.TextSize = 16
 	MiniButton.Font = Enum.Font.GothamBold
 	MiniButton.Visible = false
+	MiniButton.ZIndex = 10
 	MiniButton.Parent = ScreenGui
 
 	local MiniCorner = Instance.new("UICorner")
@@ -69,6 +78,7 @@ function NovaUI:Create(config)
 	MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
 	MainFrame.BorderSizePixel = 0
 	MainFrame.ClipsDescendants = true
+	MainFrame.ZIndex = 5
 	MainFrame.Parent = ScreenGui
 
 	local MainCorner = Instance.new("UICorner")
@@ -85,19 +95,20 @@ function NovaUI:Create(config)
 	TopBar.Name = "TopBar"
 	TopBar.Size = UDim2.new(1, 0, 0, 40)
 	TopBar.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-	TopBar.BorderSizePixel = E
+	TopBar.BorderSizePixel = 0
+	TopBar.ZIndex = 6
 	TopBar.Parent = MainFrame
 
 	local TopBarCorner = Instance.new("UICorner")
 	TopBarCorner.CornerRadius = UDim.new(0, 8)
 	TopBarCorner.Parent = TopBar
 
-	-- Arreglar esquinas inferiores del TopBar para que sean rectas
 	local FixFrame = Instance.new("Frame")
 	FixFrame.Size = UDim2.new(1, 0, 0, 10)
 	FixFrame.Position = UDim2.new(0, 0, 1, -10)
 	FixFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
 	FixFrame.BorderSizePixel = 0
+	FixFrame.ZIndex = 6
 	FixFrame.Parent = TopBar
 
 	-- Título
@@ -110,6 +121,7 @@ function NovaUI:Create(config)
 	Title.TextSize = 14
 	Title.Font = Enum.Font.GothamBold
 	Title.TextXAlignment = Enum.TextXAlignment.Left
+	Title.ZIndex = 7
 	Title.Parent = TopBar
 
 	-- Botón Minimizar "UI" (Izquierda)
@@ -121,6 +133,7 @@ function NovaUI:Create(config)
 	MinimizeBtn.TextColor3 = Color3.fromRGB(200, 200, 220)
 	MinimizeBtn.TextSize = 12
 	MinimizeBtn.Font = Enum.Font.GothamBold
+	MinimizeBtn.ZIndex = 7
 	MinimizeBtn.Parent = TopBar
 
 	local MinCorner = Instance.new("UICorner")
@@ -136,13 +149,14 @@ function NovaUI:Create(config)
 	CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 	CloseBtn.TextSize = 12
 	CloseBtn.Font = Enum.Font.GothamBold
+	CloseBtn.ZIndex = 7
 	CloseBtn.Parent = TopBar
 
 	local CloseCorner = Instance.new("UICorner")
 	CloseCorner.CornerRadius = UDim.new(0, 6)
 	CloseCorner.Parent = CloseBtn
 
-	-- Contenedor de Contenido
+	-- Contenedor
 	local Container = Instance.new("ScrollingFrame")
 	Container.Size = UDim2.new(1, -20, 1, -55)
 	Container.Position = UDim2.new(0, 10, 0, 45)
@@ -150,6 +164,7 @@ function NovaUI:Create(config)
 	Container.BorderSizePixel = 0
 	Container.CanvasSize = UDim2.new(0, 0, 0, 0)
 	Container.ScrollBarThickness = 4
+	Container.ZIndex = 6
 	Container.Parent = MainFrame
 
 	local UIList = Instance.new("UIListLayout")
@@ -161,7 +176,7 @@ function NovaUI:Create(config)
 		Container.CanvasSize = UDim2.new(0, 0, 0, UIList.AbsoluteContentSize.Y + 10)
 	end)
 
-	-- Sistema de arrastre (Dragging)
+	-- Arrastrar ventana
 	local dragging, dragInput, dragStart, startPos
 	TopBar.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -189,34 +204,31 @@ function NovaUI:Create(config)
 		end
 	end)
 
-	-- Animación y Lógica de Minimizar / Restaurar
+	-- Minimizar / Restaurar
 	local minimized = false
 	local function toggleMinimize()
 		minimized = not minimized
 		if minimized then
-			tween(MainFrame, 0.3, {Size = UDim2.new(0, 0, 0, 0), Transparency = 1})
+			tween(MainFrame, 0.3, {Size = UDim2.new(0, 0, 0, 0)})
 			task.wait(0.15)
 			MainFrame.Visible = false
 			MiniButton.Visible = true
-			tween(MiniButton, 0.3, {Size = UDim2.new(0, 50, 0, 50)})
 		else
 			MiniButton.Visible = false
 			MainFrame.Visible = true
-			tween(MainFrame, 0.3, {Size = UDim2.new(0, 480, 0, 320), Transparency = 0})
+			tween(MainFrame, 0.3, {Size = UDim2.new(0, 480, 0, 320)})
 		end
 	end
 
 	MinimizeBtn.MouseButton1Click:Connect(toggleMinimize)
 	MiniButton.MouseButton1Click:Connect(toggleMinimize)
 
-	-- Lógica de Eliminar (Cerrar completamente)
+	-- Eliminar
 	CloseBtn.MouseButton1Click:Connect(function()
-		tween(MainFrame, 0.2, {Size = UDim2.new(0, 0, 0, 0)})
-		task.wait(0.2)
 		ScreenGui:Destroy()
 	end)
 
-	-- API de Componentes para la ventana
+	-- Ventana API
 	local Window = {}
 
 	function Window:AddButton(text, callback)
@@ -228,18 +240,15 @@ function NovaUI:Create(config)
 		Btn.TextSize = 13
 		Btn.Font = Enum.Font.Gotham
 		Btn.TextXAlignment = Enum.TextXAlignment.Left
+		Btn.ZIndex = 6
 		Btn.Parent = Container
 
 		local BtnCorner = Instance.new("UICorner")
-		BtnCorner.CornerRadius = UDim.new(0, 6)
+    BtnCorner.CornerRadius = UDim.new(0, 6)
 		BtnCorner.Parent = Btn
 
 		Btn.MouseButton1Click:Connect(function()
 			pcall(callback)
-			-- Animación de clic
-			tween(Btn, 0.1, {BackgroundColor3 = Color3.fromRGB(50, 50, 75)})
-			task.wait(0.1)
-			tween(Btn, 0.1, {BackgroundColor3 = Color3.fromRGB(30, 30, 42)})
 		end)
 	end
 
