@@ -1,671 +1,417 @@
 --[[
-    NovaUI Library - Con Botón Minimizado RGB, Ajustes Automáticos y Métricas en Vivo
+    NovaUI Library - Ofuscado
 ]]
-
-local TweenService = game:GetService("TweenService")
-local CoreGui = game:GetService("CoreGui")
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-local Stats = game:GetService("Stats")
-local LocalPlayer = Players.LocalPlayer
-
-local NovaUI = {}
-
-local function tween(object, info, goals)
-	local t = TweenService:Create(object, TweenInfo.new(info, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), goals)
-	t:Play()
-	return t
-end
-
-function NovaUI:CreateWindow(config)
-	config = config or {}
-	local titleText = config.Name or "NovaUI Hub"
-	local subtitleText = config.Subtitle or ""
-	local useKeySystem = config.KeySystem or false
-	local customKey = config.Key or "1234"
-	
-	if LocalPlayer.PlayerGui:FindFirstChild("NovaUI_Main") then
-		LocalPlayer.PlayerGui.NovaUI_Main:Destroy()
+local _U={script=function(...) return ... end}
+(function(v1, v2, v3)
+	local v4 = game:GetService(v1[1])
+	local v5 = game:GetService(v1[2])
+	local v6 = game:GetService(v1[3])
+	local v7 = game:GetService(v1[4])
+	local v8 = game:GetService(v1[5])
+	local v9 = v8.LocalPlayer
+	local v10 = {}
+	local function v11(v12, v13, v14)
+		local v15 = v4:Create(v12, TweenInfo.new(v13, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), v14)
+		v15:Play()
+		return v15
 	end
-	if CoreGui:FindFirstChild("NovaUI_Main") then
-		CoreGui.NovaUI_Main:Destroy()
-	end
-
-	local ScreenGui = Instance.new("ScreenGui")
-	ScreenGui.Name = "NovaUI_Main"
-	ScreenGui.ResetOnSpawn = false
-	ScreenGui.DisplayOrder = 999
-	
-	pcall(function()
-		if syn and syn.protect_gui then
-			syn.protect_gui(ScreenGui)
-			ScreenGui.Parent = CoreGui
-		else
-			ScreenGui.Parent = CoreGui
+	function v10:CreateWindow(v16)
+		v16 = v16 or {}
+		local v17 = v16.Name or "NovaUI Hub"
+		local v18 = v16.Subtitle or ""
+		local v19 = v16.KeySystem or false
+		local v20 = v16.Key or "1234"
+		if v9.PlayerGui:FindFirstChild("NovaUI_Main") then
+			v9.PlayerGui.NovaUI_Main:Destroy()
 		end
-	end)
-	
-	if not ScreenGui.Parent then
-		ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-	end
-
-	-- Botón flotante minimizado con borde RGB fluido
-	local MiniButton = Instance.new("TextButton")
-	MiniButton.Name = "MiniButton"
-	MiniButton.Size = UDim2.new(0, 45, 0, 45)
-	MiniButton.Position = UDim2.new(0, 15, 0.5, -22)
-	MiniButton.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
-	MiniButton.Text = "UI"
-	MiniButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-	MiniButton.TextSize = 14
-	MiniButton.Font = Enum.Font.GothamBold
-	MiniButton.Visible = false
-	MiniButton.ZIndex = 100
-	MiniButton.Parent = ScreenGui
-
-	local MiniCorner = Instance.new("UICorner")
-	MiniCorner.CornerRadius = UDim.new(0, 10)
-	MiniCorner.Parent = MiniButton
-
-	local MiniStroke = Instance.new("UIStroke")
-	MiniStroke.Color = Color3.fromRGB(255, 255, 255)
-	MiniStroke.Thickness = 2.5
-	MiniStroke.Parent = MiniButton
-
-	task.spawn(function()
-		while ScreenGui.Parent do
-			for i = 0, 1, 0.005 do
-				if not ScreenGui.Parent then break end
-				MiniStroke.Color = Color3.fromHSV(i, 1, 1)
-				task.wait(0.03)
-			end
+		if v5:FindFirstChild("NovaUI_Main") then
+			v5.NovaUI_Main:Destroy()
 		end
-	end)
-
-	-- Ventana Principal (480x280)
-	local MainFrame = Instance.new("Frame")
-	MainFrame.Name = "MainFrame"
-	MainFrame.Size = UDim2.new(0, 480, 0, 280)
-	MainFrame.Position = UDim2.new(0.5, -240, 0.5, -140)
-	MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
-	MainFrame.BorderSizePixel = 0
-	MainFrame.ClipsDescendants = true
-	MainFrame.ZIndex = 10
-	MainFrame.Parent = ScreenGui
-
-	local MainCorner = Instance.new("UICorner")
-	MainCorner.CornerRadius = UDim.new(0, 8)
-	MainCorner.Parent = MainFrame
-
-	local MainStroke = Instance.new("UIStroke")
-	MainStroke.Color = Color3.fromRGB(50, 50, 70)
-	MainStroke.Thickness = 1.5
-	MainStroke.Parent = MainFrame
-
-	-- Barra Superior
-	local TopBar = Instance.new("Frame")
-	TopBar.Name = "TopBar"
-	TopBar.Size = UDim2.new(1, 0, 0, 38)
-	TopBar.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-	TopBar.BorderSizePixel = 0
-	TopBar.ZIndex = 11
-	TopBar.Parent = MainFrame
-
-	local TopBarCorner = Instance.new("UICorner")
-	TopBarCorner.CornerRadius = UDim.new(0, 8)
-	TopBarCorner.Parent = TopBar
-
-	local FixFrame = Instance.new("Frame")
-	FixFrame.Size = UDim2.new(1, 0, 0, 8)
-	FixFrame.Position = UDim2.new(0, 0, 1, -8)
-	FixFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-	FixFrame.BorderSizePixel = 0
-	FixFrame.ZIndex = 11
-	FixFrame.Parent = TopBar
-
-	-- Título y Subtítulo
-	local Title = Instance.new("TextLabel")
-	Title.Size = UDim2.new(0, 250, 0, 16)
-	Title.Position = UDim2.new(0, 45, 0, 3)
-	Title.BackgroundTransparency = 1
-	Title.Text = titleText
-	Title.TextColor3 = Color3.fromRGB(240, 240, 255)
-	Title.TextSize = 12
-	Title.Font = Enum.Font.GothamBold
-	Title.TextXAlignment = Enum.TextXAlignment.Left
-	Title.ZIndex = 12
-	Title.Parent = TopBar
-
-	local SubtitleLabel = Instance.new("TextLabel")
-	SubtitleLabel.Size = UDim2.new(0, 250, 0, 14)
-	SubtitleLabel.Position = UDim2.new(0, 45, 0, 19)
-	SubtitleLabel.BackgroundTransparency = 1
-	SubtitleLabel.Text = subtitleText
-	SubtitleLabel.TextColor3 = Color3.fromRGB(150, 150, 180)
-	SubtitleLabel.TextSize = 9
-	SubtitleLabel.Font = Enum.Font.Gotham
-	SubtitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-	SubtitleLabel.ZIndex = 12
-	SubtitleLabel.Parent = TopBar
-
-	-- Botones de la Barra (Minimizar / Cerrar)
-	local MinimizeBtn = Instance.new("TextButton")
-	MinimizeBtn.Size = UDim2.new(0, 30, 0, 24)
-	MinimizeBtn.Position = UDim2.new(0, 8, 0.5, -12)
-	MinimizeBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 55)
-	MinimizeBtn.Text = "UI"
-	MinimizeBtn.TextColor3 = Color3.fromRGB(200, 200, 220)
-	MinimizeBtn.TextSize = 11
-	MinimizeBtn.Font = Enum.Font.GothamBold
-	MinimizeBtn.ZIndex = 12
-	MinimizeBtn.Parent = TopBar
-
-	local MinCorner = Instance.new("UICorner")
-	MinCorner.CornerRadius = UDim.new(0, 5)
-	MinCorner.Parent = MinimizeBtn
-
-	local CloseBtn = Instance.new("TextButton")
-	CloseBtn.Size = UDim2.new(0, 22, 0, 22)
-	CloseBtn.Position = UDim2.new(1, -28, 0.5, -11)
-	CloseBtn.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
-	CloseBtn.Text = "X"
-	CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-	CloseBtn.TextSize = 11
-	CloseBtn.Font = Enum.Font.GothamBold
-	CloseBtn.ZIndex = 12
-	CloseBtn.Parent = TopBar
-
-	local CloseCorner = Instance.new("UICorner")
-	CloseCorner.CornerRadius = UDim.new(0, 5)
-	CloseCorner.Parent = CloseBtn
-
-	-- Contenedor de Pestañas
-	local TabContainer = Instance.new("ScrollingFrame")
-	TabContainer.Size = UDim2.new(0, 115, 1, -48)
-	TabContainer.Position = UDim2.new(0, 8, 0, 42)
-	TabContainer.BackgroundTransparency = 1
-	TabContainer.BorderSizePixel = 0
-	TabContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
-	TabContainer.ScrollBarThickness = 2
-	TabContainer.ZIndex = 11
-	TabContainer.Parent = MainFrame
-
-	local TabList = Instance.new("UIListLayout")
-	TabList.SortOrder = Enum.SortOrder.LayoutOrder
-	TabList.Padding = UDim.new(0, 5)
-	TabList.Parent = TabContainer
-
-	TabList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-		TabContainer.CanvasSize = UDim2.new(0, 0, 0, TabList.AbsoluteContentSize.Y + 10)
-	end)
-
-	local PagesFolder = Instance.new("Folder")
-	PagesFolder.Name = "PagesFolder"
-	PagesFolder.Parent = MainFrame
-
-	-- Movimiento de la Ventana
-	local dragging, dragInput, dragStart, startPos
-	TopBar.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			dragging = true
-			dragStart = input.Position
-			startPos = MainFrame.Position
-			input.Changed:Connect(function()
-				if input.UserInputState == Enum.UserInputState.End then dragging = false end
-			end)
-		end
-	end)
-
-	UserInputService.InputChanged:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			dragInput = input
-		end
-	end)
-
-	RunService.RenderStepped:Connect(function()
-		if dragging and dragInput then
-			local delta = dragInput.Position - dragStart
-			MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-		end
-	end)
-
-	local minimized = false
-	local function toggleMinimize()
-		minimized = not minimized
-		if minimized then
-			tween(MainFrame, 0.3, {Size = UDim2.new(0, 0, 0, 0)})
-			task.wait(0.15)
-			MainFrame.Visible = false
-			MiniButton.Visible = true
-		else
-			MiniButton.Visible = false
-			MainFrame.Visible = true
-			tween(MainFrame, 0.3, {Size = UDim2.new(0, 480, 0, 280)})
-		end
-	end
-
-	MinimizeBtn.MouseButton1Click:Connect(toggleMinimize)
-	MiniButton.MouseButton1Click:Connect(toggleMinimize)
-	CloseBtn.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
-
-	-- Key System
-	if useKeySystem then
-		MainFrame.Visible = false
-		local KeyFrame = Instance.new("Frame")
-		KeyFrame.Size = UDim2.new(0, 320, 0, 180)
-		KeyFrame.Position = UDim2.new(0.5, -160, 0.5, -90)
-		KeyFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
-		KeyFrame.ZIndex = 50
-		KeyFrame.Parent = ScreenGui
-
-		local KeyCorner = Instance.new("UICorner")
-		KeyCorner.CornerRadius = UDim.new(0, 8)
-		KeyCorner.Parent = KeyFrame
-
-		local KeyStroke = Instance.new("UIStroke")
-		KeyStroke.Color = Color3.fromRGB(80, 80, 120)
-		KeyStroke.Thickness = 1.5
-		KeyStroke.Parent = KeyFrame
-
-		local KeyTitle = Instance.new("TextLabel")
-		KeyTitle.Size = UDim2.new(1, 0, 0, 30)
-		KeyTitle.Position = UDim2.new(0, 0, 0, 8)
-		KeyTitle.BackgroundTransparency = 1
-		KeyTitle.Text = titleText .. " - Key"
-		KeyTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-		KeyTitle.TextSize = 14
-		KeyTitle.Font = Enum.Font.GothamBold
-		KeyTitle.ZIndex = 51
-		KeyTitle.Parent = KeyFrame
-
-		local KeyBox = Instance.new("TextBox")
-		KeyBox.Size = UDim2.new(1, -30, 0, 30)
-		KeyBox.Position = UDim2.new(0, 15, 0, 60)
-		KeyBox.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
-		KeyBox.Text = ""
-		KeyBox.PlaceholderText = "Escribe tu llave..."
-		KeyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-		KeyBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 150)
-		KeyBox.TextSize = 12
-		KeyBox.Font = Enum.Font.Gotham
-		KeyBox.ZIndex = 51
-		KeyBox.Parent = KeyFrame
-
-		local BoxCorner = Instance.new("UICorner")
-		BoxCorner.CornerRadius = UDim.new(0, 5)
-		BoxCorner.Parent = KeyBox
-
-		local VerifyBtn = Instance.new("TextButton")
-		VerifyBtn.Size = UDim2.new(1, -30, 0, 30)
-		VerifyBtn.Position = UDim2.new(0, 15, 0, 110)
-		VerifyBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 200)
-		VerifyBtn.Text = "Verificar"
-		VerifyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-		VerifyBtn.TextSize = 12
-		VerifyBtn.Font = Enum.Font.GothamBold
-		VerifyBtn.ZIndex = 51
-		VerifyBtn.Parent = KeyFrame
-
-		local BtnCorner = Instance.new("UICorner")
-		BtnCorner.CornerRadius = UDim.new(0, 5)
-		BtnCorner.Parent = VerifyBtn
-
-		VerifyBtn.MouseButton1Click:Connect(function()
-			if KeyBox.Text == customKey then
-				KeyFrame:Destroy()
-				MainFrame.Visible = true
+		local v21 = Instance.new("ScreenGui")
+		v21.Name = "NovaUI_Main"
+		v21.ResetOnSpawn = false
+		v21.DisplayOrder = 999
+		pcall(function()
+			if syn and syn.protect_gui then
+				syn.protect_gui(v21)
+				v21.Parent = v5
 			else
-				KeyBox.Text = ""
-				KeyBox.PlaceholderText = "¡Incorrecta!"
+				v21.Parent = v5
 			end
 		end)
-	end
-
-	local Window = {}
-	local firstTab = true
-
-	local function createTabInternal(tabName, isDefault)
-		local TabButton = Instance.new("TextButton")
-		TabButton.Size = UDim2.new(1, 0, 0, 28)
-		TabButton.BackgroundColor3 = Color3.fromRGB(28, 28, 38)
-		TabButton.Text = "  " .. tabName
-		TabButton.TextColor3 = Color3.fromRGB(160, 160, 180)
-		TabButton.TextSize = 11
-		TabButton.Font = Enum.Font.GothamMedium
-		TabButton.TextXAlignment = Enum.TextXAlignment.Left
-		TabButton.ZIndex = 11
-		TabButton.Parent = TabContainer
-
-		local TabCorner = Instance.new("UICorner")
-		TabCorner.CornerRadius = UDim.new(0, 5)
-		TabCorner.Parent = TabButton
-
-		local Page = Instance.new("ScrollingFrame")
-		Page.Size = UDim2.new(1, -135, 1, -48)
-		Page.Position = UDim2.new(0, 128, 0, 42)
-		Page.BackgroundTransparency = 1
-		Page.BorderSizePixel = 0
-		Page.CanvasSize = UDim2.new(0, 0, 0, 0)
-		Page.ScrollBarThickness = 3
-		Page.Visible = false
-		Page.ZIndex = 11
-		Page.Parent = PagesFolder
-
-		local PageList = Instance.new("UIListLayout")
-		PageList.SortOrder = Enum.SortOrder.LayoutOrder
-		PageList.Padding = UDim.new(0, 6)
-		PageList.Parent = Page
-
-		PageList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-			Page.CanvasSize = UDim2.new(0, 0, 0, PageList.AbsoluteContentSize.Y + 10)
+		if not v21.Parent then
+			v21.Parent = v9:WaitForChild("PlayerGui")
+		end
+		local v22 = Instance.new("TextButton")
+		v22.Name = "MiniButton"
+		v22.Size = UDim2.new(0, 45, 0, 45)
+		v22.Position = UDim2.new(0, 15, 0, 15)
+		v22.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+		v22.Text = "UI"
+		v22.TextColor3 = Color3.fromRGB(255, 255, 255)
+		v22.TextSize = 14
+		v22.Font = Enum.Font.GothamBold
+		v22.Visible = false
+		v22.ZIndex = 100
+		v22.Parent = v21
+		local v23 = Instance.new("UICorner")
+		v23.CornerRadius = UDim.new(0, 10)
+		v23.Parent = v22
+		local v24 = Instance.new("UIStroke")
+		v24.Color = Color3.fromRGB(255, 255, 255)
+		v24.Thickness = 2.5
+		v24.Parent = v22
+		task.spawn(function()
+			while v21.Parent do
+				for i = 0, 1, 0.005 do
+					if not v21.Parent then break end
+					v24.Color = Color3.fromHSV(i, 1, 1)
+					task.wait(0.03)
+				end
+			end
 		end)
-
-		if (isDefault and firstTab) or (firstTab and not useKeySystem) then
-			firstTab = false
-			Page.Visible = true
-			TabButton.BackgroundColor3 = Color3.fromRGB(50, 50, 75)
-			TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-		end
-
-		TabButton.MouseButton1Click:Connect(function()
-			for _, p in pairs(PagesFolder:GetChildren()) do
-				if p:IsA("ScrollingFrame") then p.Visible = false end
-			end
-			for _, b in pairs(TabContainer:GetChildren()) do
-				if b:IsA("TextButton") then
-					b.BackgroundColor3 = Color3.fromRGB(28, 28, 38)
-					b.TextColor3 = Color3.fromRGB(160, 160, 180)
-				end
-			end
-			Page.Visible = true
-			TabButton.BackgroundColor3 = Color3.fromRGB(50, 50, 75)
-			TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+		local v25 = Instance.new("Frame")
+		v25.Name = "MainFrame"
+		v25.Size = UDim2.new(0, 480, 0, 280)
+		v25.Position = UDim2.new(0.5, -240, 0.5, -140)
+		v25.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
+		v25.BorderSizePixel = 0
+		v25.ClipsDescendants = true
+		v25.ZIndex = 10
+		v25.Parent = v21
+		local v26 = Instance.new("UICorner")
+		v26.CornerRadius = UDim.new(0, 8)
+		v26.Parent = v25
+		local v27 = Instance.new("UIStroke")
+		v27.Color = Color3.fromRGB(50, 50, 70)
+		v27.Thickness = 1.5
+		v27.Parent = v25
+		local v28 = Instance.new("Frame")
+		v28.Name = "TopBar"
+		v28.Size = UDim2.new(1, 0, 0, 38)
+		v28.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+		v28.BorderSizePixel = 0
+		v28.ZIndex = 11
+		v28.Parent = v25
+		local v29 = Instance.new("UICorner")
+		v29.CornerRadius = UDim.new(0, 8)
+		v29.Parent = v28
+		local v30 = Instance.new("Frame")
+		v30.Size = UDim2.new(1, 0, 0, 8)
+		v30.Position = UDim2.new(0, 0, 1, -8)
+		v30.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+		v30.BorderSizePixel = 0
+		v30.ZIndex = 11
+		v30.Parent = v28
+		local v31 = Instance.new("TextLabel")
+		v31.Size = UDim2.new(0, 250, 0, 16)
+		v31.Position = UDim2.new(0, 45, 0, 3)
+		v31.BackgroundTransparency = 1
+		v31.Text = v17
+		v31.TextColor3 = Color3.fromRGB(240, 240, 255)
+		v31.TextSize = 12
+		v31.Font = Enum.Font.GothamBold
+		v31.TextXAlignment = Enum.TextXAlignment.Left
+		v31.ZIndex = 12
+		v31.Parent = v28
+		local v32 = Instance.new("TextLabel")
+		v32.Size = UDim2.new(0, 250, 0, 14)
+		v32.Position = UDim2.new(0, 45, 0, 19)
+		v32.BackgroundTransparency = 1
+		v32.Text = v18
+		v32.TextColor3 = Color3.fromRGB(150, 150, 180)
+		v32.TextSize = 9
+		v32.Font = Enum.Font.Gotham
+		v32.TextXAlignment = Enum.TextXAlignment.Left
+		v32.ZIndex = 12
+		v32.Parent = v28
+		local v33 = Instance.new("TextButton")
+		v33.Size = UDim2.new(0, 30, 0, 24)
+		v33.Position = UDim2.new(0, 8, 0.5, -12)
+		v33.BackgroundColor3 = Color3.fromRGB(40, 40, 55)
+		v33.Text = "UI"
+		v33.TextColor3 = Color3.fromRGB(200, 200, 220)
+		v33.TextSize = 11
+		v33.Font = Enum.Font.GothamBold
+		v33.ZIndex = 12
+		v33.Parent = v28
+		local v34 = Instance.new("UICorner")
+		v34.CornerRadius = UDim.new(0, 5)
+		v34.Parent = v33
+		local v35 = Instance.new("TextButton")
+		v35.Size = UDim2.new(0, 22, 0, 22)
+		v35.Position = UDim2.new(1, -28, 0.5, -11)
+		v35.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
+		v35.Text = "X"
+		v35.TextColor3 = Color3.fromRGB(255, 255, 255)
+		v35.TextSize = 11
+		v35.Font = Enum.Font.GothamBold
+		v35.ZIndex = 12
+		v35.Parent = v28
+		local v36 = Instance.new("UICorner")
+		v36.CornerRadius = UDim.new(0, 5)
+		v36.Parent = v35
+		local v37 = Instance.new("ScrollingFrame")
+		v37.Size = UDim2.new(0, 115, 1, -48)
+		v37.Position = UDim2.new(0, 8, 0, 42)
+		v37.BackgroundTransparency = 1
+		v37.BorderSizePixel = 0
+		v37.CanvasSize = UDim2.new(0, 0, 0, 0)
+		v37.ScrollBarThickness = 2
+		v37.ZIndex = 11
+		v37.Parent = v25
+		local v38 = Instance.new("UIListLayout")
+		v38.SortOrder = Enum.SortOrder.LayoutOrder
+		v38.Padding = UDim.new(0, 5)
+		v38.Parent = v37
+		v38:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+			v37.CanvasSize = UDim2.new(0, 0, 0, v38.AbsoluteContentSize.Y + 10)
 		end)
-
-		local TabAPI = {}
-
-		function TabAPI:AddButton(text, sideText, callback)
-			local Btn = Instance.new("TextButton")
-			Btn.Size = UDim2.new(1, 0, 0, 30)
-			Btn.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
-			Btn.Text = "  " .. text
-			Btn.TextColor3 = Color3.fromRGB(220, 220, 240)
-			Btn.TextSize = 12
-			Btn.Font = Enum.Font.Gotham
-			Btn.TextXAlignment = Enum.TextXAlignment.Left
-			Btn.ZIndex = 11
-			Btn.Parent = Page
-
-			local BtnCorner = Instance.new("UICorner")
-			BtnCorner.CornerRadius = UDim.new(0, 5)
-			BtnCorner.Parent = Btn
-
-			local SideLabel
-			if sideText then
-				SideLabel = Instance.new("TextLabel")
-				SideLabel.Size = UDim2.new(0, 100, 1, 0)
-				SideLabel.Position = UDim2.new(1, -105, 0, 0)
-				SideLabel.BackgroundTransparency = 1
-				SideLabel.Text = sideText
-				SideLabel.TextColor3 = Color3.fromRGB(130, 130, 160)
-				SideLabel.TextSize = 10
-				SideLabel.Font = Enum.Font.GothamBold
-				SideLabel.TextXAlignment = Enum.TextXAlignment.Right
-				SideLabel.ZIndex = 12
-				SideLabel.Parent = Btn
-			end
-
-			Btn.MouseButton1Click:Connect(function()
-				pcall(callback)
-				tween(Btn, 0.1, {BackgroundColor3 = Color3.fromRGB(50, 50, 75)})
-				task.wait(0.1)
-				tween(Btn, 0.1, {BackgroundColor3 = Color3.fromRGB(30, 30, 42)})
-			end)
-
-			return Btn, SideLabel
-		end
-
-		function TabAPI:AddToggle(text, default, callback)
-			default = default or false
-			local toggled = default
-			local ToggleBtn = Instance.new("TextButton")
-			ToggleBtn.Size = UDim2.new(1, 0, 0, 30)
-			ToggleBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
-			ToggleBtn.Text = "  " .. text
-			ToggleBtn.TextColor3 = Color3.fromRGB(220, 220, 240)
-			ToggleBtn.TextSize = 12
-			ToggleBtn.Font = Enum.Font.Gotham
-			ToggleBtn.TextXAlignment = Enum.TextXAlignment.Left
-			ToggleBtn.ZIndex = 11
-			ToggleBtn.Parent = Page
-
-			local Corner = Instance.new("UICorner")
-			Corner.CornerRadius = UDim.new(0, 5)
-			Corner.Parent = ToggleBtn
-
-			local Switch = Instance.new("Frame")
-			Switch.Size = UDim2.new(0, 36, 0, 18)
-			Switch.Position = UDim2.new(1, -44, 0.5, -9)
-			Switch.BackgroundColor3 = toggled and Color3.fromRGB(100, 100, 220) or Color3.fromRGB(45, 45, 65)
-			Switch.BorderSizePixel = 0
-			Switch.ZIndex = 12
-			Switch.Parent = ToggleBtn
-
-			local SwitchCorner = Instance.new("UICorner")
-			SwitchCorner.CornerRadius = UDim.new(0, 9)
-			SwitchCorner.Parent = Switch
-
-			local Circle = Instance.new("Frame")
-			Circle.Size = UDim2.new(0, 14, 0, 14)
-			Circle.Position = toggled and UDim2.new(1, -16, 0.5, -7) or UDim2.new(0, 2, 0.5, -7)
-			Circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			Circle.BorderSizePixel = 0
-			Circle.ZIndex = 13
-			Circle.Parent = Switch
-
-			local CircleCorner = Instance.new("UICorner")
-			CircleCorner.CornerRadius = UDim.new(1, 0)
-			CircleCorner.Parent = Circle
-
-			ToggleBtn.MouseButton1Click:Connect(function()
-				toggled = not toggled
-				tween(Switch, 0.2, {BackgroundColor3 = toggled and Color3.fromRGB(100, 100, 220) or Color3.fromRGB(45, 45, 65)})
-				tween(Circle, 0.2, {Position = toggled and UDim2.new(1, -16, 0.5, -7) or UDim2.new(0, 2, 0.5, -7)})
-				pcall(callback, toggled)
-			end)
-		end
-
-		function TabAPI:AddSlider(text, min, max, default, callback)
-			min = min or 0; max = max or 100; default = default or min
-			local SliderFrame = Instance.new("Frame")
-			SliderFrame.Size = UDim2.new(1, 0, 0, 42)
-			SliderFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
-			SliderFrame.ZIndex = 11
-			SliderFrame.Parent = Page
-
-			local SliderCorner = Instance.new("UICorner")
-			SliderCorner.CornerRadius = UDim.new(0, 5)
-			SliderCorner.Parent = SliderFrame
-
-			local Label = Instance.new("TextLabel")
-			Label.Size = UDim2.new(1, -20, 0, 18)
-			Label.Position = UDim2.new(0, 8, 0, 3)
-			Label.BackgroundTransparency = 1
-			Label.Text = text
-			Label.TextColor3 = Color3.fromRGB(220, 220, 240)
-			Label.TextSize = 11
-			Label.Font = Enum.Font.Gotham
-			Label.TextXAlignment = Enum.TextXAlignment.Left
-			Label.ZIndex = 12
-			Label.Parent = SliderFrame
-
-			local ValueLabel = Instance.new("TextLabel")
-			ValueLabel.Size = UDim2.new(0, 45, 0, 18)
-			ValueLabel.Position = UDim2.new(1, -52, 0, 3)
-			ValueLabel.BackgroundTransparency = 1
-			ValueLabel.Text = tostring(default)
-			ValueLabel.TextColor3 = Color3.fromRGB(150, 150, 180)
-			ValueLabel.TextSize = 11
-			ValueLabel.Font = Enum.Font.GothamBold
-			ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
-			ValueLabel.ZIndex = 12
-			ValueLabel.Parent = SliderFrame
-
-			local SliderBar = Instance.new("Frame")
-			SliderBar.Size = UDim2.new(1, -16, 0, 5)
-			SliderBar.Position = UDim2.new(0, 8, 0, 26)
-			SliderBar.BackgroundColor3 = Color3.fromRGB(45, 45, 65)
-			SliderBar.BorderSizePixel = 0
-			SliderBar.ZIndex = 12
-			SliderBar.Parent = SliderFrame
-
-			local BarCorner = Instance.new("UICorner")
-			BarCorner.CornerRadius = UDim.new(0, 2)
-			BarCorner.Parent = SliderBar
-
-			local Fill = Instance.new("Frame")
-			Fill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
-			Fill.BackgroundColor3 = Color3.fromRGB(100, 100, 220)
-			Fill.BorderSizePixel = 0
-			Fill.ZIndex = 13
-			Fill.Parent = SliderBar
-
-			local FillCorner = Instance.new("UICorner")
-			FillCorner.CornerRadius = UDim.new(0, 2)
-			FillCorner.Parent = Fill
-
-			local draggingSlider = false
-			local function updateValue(input)
-				local pos = UDim2.new(math.clamp((input.Position.X - SliderBar.AbsolutePosition.X) / SliderBar.AbsoluteSize.X, 0, 1), 0, 1, 0)
-				Fill.Size = pos
-				local val = math.floor(min + ((max - min) * pos.X.Scale))
-				ValueLabel.Text = tostring(val)
-				pcall(callback, val)
-			end
-
-			SliderBar.InputBegan:Connect(function(input)
-				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-					draggingSlider = true
-					updateValue(input)
-				end
-			end)
-			UserInputService.InputEnded:Connect(function(input)
-				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-					draggingSlider = false
-				end
-			end)
-			UserInputService.InputChanged:Connect(function(input)
-				if draggingSlider and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-					updateValue(input)
-				end
-			end)
-		end
-
-		function TabAPI:AddLabel(text)
-			local Label = Instance.new("TextLabel")
-			Label.Size = UDim2.new(1, 0, 0, 20)
-			Label.BackgroundTransparency = 1
-			Label.Text = "  " .. text
-			Label.TextColor3 = Color3.fromRGB(150, 150, 180)
-			Label.TextSize = 11
-			Label.Font = Enum.Font.GothamBold
-			Label.TextXAlignment = Enum.TextXAlignment.Left
-			Label.ZIndex = 11
-			Label.Parent = Page
-		end
-
-		function TabAPI:AddTextbox(text, placeholder, callback)
-			local TextboxFrame = Instance.new("Frame")
-			TextboxFrame.Size = UDim2.new(1, 0, 0, 30)
-			TextboxFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
-			TextboxFrame.ZIndex = 11
-			TextboxFrame.Parent = Page
-
-			local FrameCorner = Instance.new("UICorner")
-			FrameCorner.CornerRadius = UDim.new(0, 5)
-			FrameCorner.Parent = TextboxFrame
-
-			local Label = Instance.new("TextLabel")
-			Label.Size = UDim2.new(0, 120, 1, 0)
-			Label.Position = UDim2.new(0, 8, 0, 0)
-			Label.BackgroundTransparency = 1
-			Label.Text = text
-			Label.TextColor3 = Color3.fromRGB(220, 220, 240)
-			Label.TextSize = 11
-			Label.Font = Enum.Font.Gotham
-			Label.TextXAlignment = Enum.TextXAlignment.Left
-			Label.ZIndex = 12
-			Label.Parent = TextboxFrame
-
-			local Box = Instance.new("TextBox")
-			Box.Size = UDim2.new(0, 140, 0, 22)
-			Box.Position = UDim2.new(1, -148, 0.5, -11)
-			Box.BackgroundColor3 = Color3.fromRGB(40, 40, 55)
-			Box.Text = ""
-			Box.PlaceholderText = placeholder or "Escribe..."
-			Box.TextColor3 = Color3.fromRGB(255, 255, 255)
-			Box.PlaceholderColor3 = Color3.fromRGB(130, 130, 160)
-			Box.TextSize = 11
-			Box.Font = Enum.Font.Gotham
-			Box.ZIndex = 12
-			Box.Parent = TextboxFrame
-
-			local BoxCorner = Instance.new("UICorner")
-			BoxCorner.CornerRadius = UDim.new(0, 4)
-			BoxCorner.Parent = Box
-
-			Box.FocusLost:Connect(function()
-				pcall(callback, Box.Text)
-			end)
-		end
-
-		return TabAPI
-	end
-
-	-- Pestaña obligatoria y predeterminada "Ajustes" automatizada con métricas en vivo
-	local SettingsTab = createTabInternal("Ajustes", true)
-	SettingsTab:AddLabel("--- Información del Jugador ---")
-	
-	local _, UserSide = SettingsTab:AddButton("Usuario: " .. LocalPlayer.Name, LocalPlayer.DisplayName, function() end)
-	local _, PingSide = SettingsTab:AddButton("Ping actual", "Calculando...", function() end)
-	local _, FpsSide = SettingsTab:AddButton("FPS actuales", "Calculando...", function() end)
-
-	-- Bucle para actualizar Ping y FPS en tiempo real
-	task.spawn(function()
-		local lastUpdate = 0
-		RunService.RenderStepped:Connect(function(dt)
-			if tick() - lastUpdate >= 0.5 then
-				lastUpdate = tick()
-				pcall(function()
-					local ping = math.floor(LocalPlayer:GetNetworkPing() * 1000)
-					local fps = math.floor(1 / dt)
-					if PingSide then PingSide.Text = ping .. " ms" end
-					if FpsSide then FpsSide.Text = tostring(fps) end
+		local v39 = Instance.new("Folder")
+		v39.Name = "PagesFolder"
+		v39.Parent = v25
+		local v40, v41, v42, v43
+		v28.InputBegan:Connect(function(v44)
+			if v44.UserInputType == Enum.UserInputType.MouseButton1 or v44.UserInputType == Enum.UserInputType.Touch then
+				v40 = true
+				v42 = v44.Position
+				v43 = v25.Position
+				v44.Changed:Connect(function()
+					if v44.UserInputState == Enum.UserInputState.End then v40 = false end
 				end)
 			end
 		end)
-	end)
-
-	SettingsTab:AddLabel("--- Personalización de Temas ---")
-	SettingsTab:AddButton("Tema Oscuro (Estándar)", "Aplicar", function()
-		MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
-		TopBar.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-	end)
-	SettingsTab:AddButton("Tema Azul Nocturno", "Aplicar", function()
-		MainFrame.BackgroundColor3 = Color3.fromRGB(15, 22, 36)
-		TopBar.BackgroundColor3 = Color3.fromRGB(20, 30, 48)
-	end)
-	SettingsTab:AddButton("Tema Gris Minimalista", "Aplicar", function()
-		MainFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
-		TopBar.BackgroundColor3 = Color3.fromRGB(38, 38, 38)
-	end)
-
-	function Window:AddTab(tabName)
-		return createTabInternal(tabName, false)
+		v7.InputChanged:Connect(function(v45)
+			if v45.UserInputType == Enum.UserInputType.MouseButton1 or v45.UserInputType == Enum.UserInputType.Touch then
+				v41 = v45
+			end
+		end)
+		v6.RenderStepped:Connect(function()
+			if v40 and v41 then
+				local v46 = v41.Position - v42
+				v25.Position = UDim2.new(v43.X.Scale, v43.X.Offset + v46.X, v43.Y.Scale, v43.Y.Offset + v46.Y)
+			end
+		end)
+		local v47 = false
+		local function v48()
+			v47 = not v47
+			if v47 then
+				v11(v25, 0.3, {Size = UDim2.new(0, 0, 0, 0)})
+				task.wait(0.15)
+				v25.Visible = false
+				v22.Visible = true
+			else
+				v22.Visible = false
+				v25.Visible = true
+				v11(v25, 0.3, {Size = UDim2.new(0, 480, 0, 280)})
+			end
+		end
+		v33.MouseButton1Click:Connect(v48)
+		v22.MouseButton1Click:Connect(v48)
+		v35.MouseButton1Click:Connect(function() v21:Destroy() end)
+		if v19 then
+			v25.Visible = false
+			local v49 = Instance.new("Frame")
+			v49.Size = UDim2.new(0, 320, 0, 180)
+			v49.Position = UDim2.new(0.5, -160, 0.5, -90)
+			v49.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
+			v49.ZIndex = 50
+			v49.Parent = v21
+			local v50 = Instance.new("UICorner")
+			v50.CornerRadius = UDim.new(0, 8)
+			v50.Parent = v49
+			local v51 = Instance.new("UIStroke")
+			v51.Color = Color3.fromRGB(80, 80, 120)
+			v51.Thickness = 1.5
+			v51.Parent = v49
+			local v52 = Instance.new("TextLabel")
+			v52.Size = UDim2.new(1, 0, 0, 30)
+			v52.Position = UDim2.new(0, 0, 0, 8)
+			v52.BackgroundTransparency = 1
+			v52.Text = v17 .. " - Key"
+			v52.TextColor3 = Color3.fromRGB(255, 255, 255)
+			v52.TextSize = 14
+			v52.Font = Enum.Font.GothamBold
+			v52.ZIndex = 51
+			v52.Parent = v49
+			local v53 = Instance.new("TextBox")
+			v53.Size = UDim2.new(1, -30, 0, 30)
+			v53.Position = UDim2.new(0, 15, 0, 60)
+			v53.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
+			v53.Text = ""
+			v53.PlaceholderText = "Escribe tu llave..."
+			v53.TextColor3 = Color3.fromRGB(255, 255, 255)
+			v53.PlaceholderColor3 = Color3.fromRGB(120, 120, 150)
+			v53.TextSize = 12
+			v53.Font = Enum.Font.Gotham
+			v53.ZIndex = 51
+			v53.Parent = v49
+			local v54 = Instance.new("UICorner")
+			v54.CornerRadius = UDim.new(0, 5)
+			v54.Parent = v53
+			local v55 = Instance.new("TextButton")
+			v55.Size = UDim2.new(1, -30, 0, 30)
+			v55.Position = UDim2.new(0, 15, 0, 110)
+			v55.BackgroundColor3 = Color3.fromRGB(80, 80, 200)
+			v55.Text = "Verificar"
+			v55.TextColor3 = Color3.fromRGB(255, 255, 255)
+			v55.TextSize = 12
+			v55.Font = Enum.Font.GothamBold
+			v55.ZIndex = 51
+			v55.Parent = v49
+			local v56 = Instance.new("UICorner")
+			v56.CornerRadius = UDim.new(0, 5)
+			v56.Parent = v55
+			v55.MouseButton1Click:Connect(function()
+				if v53.Text == v20 then
+					v49:Destroy()
+					v25.Visible = true
+				else
+					v53.Text = ""
+					v53.PlaceholderText = "¡Incorrecta!"
+				end
+			end)
+		end
+		local v57 = {}
+		local v58 = true
+		local function v59(v60, v61)
+			local v62 = Instance.new("TextButton")
+			v62.Size = UDim2.new(1, 0, 0, 28)
+			v62.BackgroundColor3 = Color3.fromRGB(28, 28, 38)
+			v62.Text = "  " .. v60
+			v62.TextColor3 = Color3.fromRGB(160, 160, 180)
+			v62.TextSize = 11
+			v62.Font = Enum.Font.GothamMedium
+			v62.TextXAlignment = Enum.TextXAlignment.Left
+			v62.ZIndex = 11
+			v62.Parent = v37
+			local v63 = Instance.new("UICorner")
+			v63.CornerRadius = UDim.new(0, 5)
+			v63.Parent = v62
+			local v64 = Instance.new("ScrollingFrame")
+			v64.Size = UDim2.new(1, -135, 1, -48)
+			v64.Position = UDim2.new(0, 128, 0, 42)
+			v64.BackgroundTransparency = 1
+			v64.BorderSizePixel = 0
+			v64.CanvasSize = UDim2.new(0, 0, 0, 0)
+			v64.ScrollBarThickness = 3
+			v64.Visible = false
+			v64.ZIndex = 11
+			v64.Parent = v39
+			local v65 = Instance.new("UIListLayout")
+			v65.SortOrder = Enum.SortOrder.LayoutOrder
+			v65.Padding = UDim.new(0, 6)
+			v65.Parent = v64
+			v65:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+				v64.CanvasSize = UDim2.new(0, 0, 0, v65.AbsoluteContentSize.Y + 10)
+			end)
+			if (v61 and v58) or (v58 and not v19) then
+				v58 = false
+				v64.Visible = true
+				v62.BackgroundColor3 = Color3.fromRGB(50, 50, 75)
+				v62.TextColor3 = Color3.fromRGB(255, 255, 255)
+			end
+			v62.MouseButton1Click:Connect(function()
+				for _, v66 in pairs(v39:GetChildren()) do
+					if v66:IsA("ScrollingFrame") then v66.Visible = false end
+				end
+				for _, v67 in pairs(v37:GetChildren()) do
+					if v67:IsA("TextButton") then
+						v67.BackgroundColor3 = Color3.fromRGB(28, 28, 38)
+						v67.TextColor3 = Color3.fromRGB(160, 160, 180)
+					end
+				end
+				v64.Visible = true
+				v62.BackgroundColor3 = Color3.fromRGB(50, 50, 75)
+				v62.TextColor3 = Color3.fromRGB(255, 255, 255)
+			end)
+			local v68 = {}
+			function v68:AddButton(v69, v70, v71)
+				local v72 = Instance.new("TextButton")
+				v72.Size = UDim2.new(1, 0, 0, 30)
+				v72.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
+				v72.Text = "  " .. v69
+				v72.TextColor3 = Color3.fromRGB(220, 220, 240)
+				v72.TextSize = 12
+				v72.Font = Enum.Font.Gotham
+				v72.TextXAlignment = Enum.TextXAlignment.Left
+				v72.ZIndex = 11
+				v72.Parent = v64
+				local v73 = Instance.new("UICorner")
+				v73.CornerRadius = UDim.new(0, 5)
+				v73.Parent = v72
+				local v74
+				if v70 then
+					v74 = Instance.new("TextLabel")
+					v74.Size = UDim2.new(0, 100, 1, 0)
+					v74.Position = UDim2.new(1, -105, 0, 0)
+					v74.BackgroundTransparency = 1
+					v74.Text = v70
+					v74.TextColor3 = Color3.fromRGB(130, 130, 160)
+					v74.TextSize = 10
+					v74.Font = Enum.Font.GothamBold
+					v74.TextXAlignment = Enum.TextXAlignment.Right
+					v74.ZIndex = 12
+					v74.Parent = v72
+				end
+				v72.MouseButton1Click:Connect(function()
+					pcall(v71)
+					v11(v72, 0.1, {BackgroundColor3 = Color3.fromRGB(50, 50, 75)})
+					task.wait(0.1)
+					v11(v72, 0.1, {BackgroundColor3 = Color3.fromRGB(30, 30, 42)})
+				end)
+				return v72, v74
+			end
+			function v68:AddLabel(v75)
+				local v76 = Instance.new("TextLabel")
+				v76.Size = UDim2.new(1, 0, 0, 20)
+				v76.BackgroundTransparency = 1
+				v76.Text = "  " .. v75
+				v76.TextColor3 = Color3.fromRGB(150, 150, 180)
+				v76.TextSize = 11
+				v76.Font = Enum.Font.GothamBold
+				v76.TextXAlignment = Enum.TextXAlignment.Left
+				v76.ZIndex = 11
+				v76.Parent = v64
+			end
+			return v68
+		end
+		local v77 = v59("Ajustes", true)
+		v77:AddLabel("--- Información del Jugador ---")
+		local _, v78 = v77:AddButton("Usuario: " .. v9.Name, v9.DisplayName, function() end)
+		local _, v79 = v77:AddButton("Ping actual", "Calculando...", function() end)
+		local _, v80 = v77:AddButton("FPS actuales", "Calculando...", function() end)
+		task.spawn(function()
+			local v81 = 0
+			v6.RenderStepped:Connect(function(v82)
+				if tick() - v81 >= 0.5 then
+					v81 = tick()
+					pcall(function()
+						local v83 = math.floor(v9:GetNetworkPing() * 1000)
+						local v84 = math.floor(1 / v82)
+						if v79 then v79.Text = v83 .. " ms" end
+						if v80 then v80.Text = tostring(v84) end
+					end)
+				end
+			end)
+		end)
+		v77:AddLabel("--- Personalización de Temas ---")
+		v77:AddButton("Tema Oscuro (Estándar)", "Aplicar", function()
+			v25.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
+			v28.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+		end)
+		v77:AddButton("Tema Azul Nocturno", "Aplicar", function()
+			v25.BackgroundColor3 = Color3.fromRGB(15, 22, 36)
+			v28.BackgroundColor3 = Color3.fromRGB(20, 30, 48)
+		end)
+		v77:AddButton("Tema Gris Minimalista", "Aplicar", function()
+			v25.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
+			v28.BackgroundColor3 = Color3.fromRGB(38, 38, 38)
+		end)
+		function v57:AddTab(v85)
+			return v59(v85, false)
+		end
+		return v57
 	end
-
-	return Window
-end
-
-return NovaUI
+	return v10
+end)({"TweenService", "CoreGui", "RunService", "UserInputService", "Players"}, {}, {})
