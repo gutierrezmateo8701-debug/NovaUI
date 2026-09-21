@@ -1,687 +1,249 @@
---!nocheck
---[[===========================================================
-    NovaUI v3.0  |  Librería de UI para Roblox / Delta Executor
-    -----------------------------------------------------------
-    Uso:
-      local W = CreateWindow({
-          Name = "MateoHub",
-          Subtitle = "De mateo",
-          KeySystem = false,       -- true para activar
-          Keys = {"mateo2024"},    -- claves válidas
-      })
+--[[
+    NovaUI Library - Creado desde cero
+    Sintaxis limpia y moderna
+]]
 
-      local T = W:CreateTab("Main")
-      local S = T:CreateSection("Sección")
-      S.Tg{ Name = "Toggle", Flag = "tg1" }
-===========================================================]]
+local TweenService = game:GetService("TweenService")
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
 
-local _g,_gs = game, game.GetService
-local _P = _gs(_g,"Players")
-local _U = _gs(_g,"UserInputService")
-local _T = _gs(_g,"TweenService")
-local _C = _gs(_g,"CoreGui")
-local _L = _P.LocalPlayer
-local _new,_ud2,_udo,_rgb = Instance.new, UDim2.new, UDim2.fromOffset, Color3.fromRGB
-local _E,_F = Enum, Enum.Font
+local NovaUI = {}
+NovaUI.__index = visuals or {}
 
---// LIBRERÍA
-local N = {}
-N.Flags = {}
-N.Theme = {
-    A  = _rgb(88,101,242),
-    Bg = _rgb(18,18,22),
-    Bg2= _rgb(28,28,34),
-    Bg3= _rgb(38,38,46),
-    Tx = _rgb(240,240,245),
-    Sb = _rgb(150,150,165),
-    Ln = _rgb(48,48,58),
-    Er = _rgb(237,66,69),
-    Ok = _rgb(59,165,93),
-    Wn = _rgb(250,180,65),
-    Ft = _F.GothamMedium,
-}
-local TH = N.Theme
-local FL = N.Flags
-
---// PADRE SEGURO
-local function _parent()
-    if type(gethui)=="function" then
-        local ok,r = pcall(gethui); if ok and r then return r end
-    end
-    local ok,r = pcall(function() return _C end)
-    if ok and r then return r end
-    return _L:WaitForChild("PlayerGui")
-end
-local function _protect(g)
-    if type(syn)=="table" and syn.protect_gui then pcall(syn.protect_gui,g) end
-    if type(protect_gui)=="function" then pcall(protect_gui,g) end
+-- Función para animaciones rápidas
+local function tween(object, info, goals)
+	local t = TweenService:Create(object, TweenInfo.new(info, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), goals)
+	t:Play()
+	return t
 end
 
---// HELPERS
-local function _inst(cls,p)
-    local i=_new(cls)
-    for k,v in pairs(p or {}) do if k~="Parent" then i[k]=v end end
-    if p and p.Parent then i.Parent=p.Parent end
-    return i
-end
-local function _cn(p,r) return _inst("UICorner",{CornerRadius=UDim.new(0,r or 6),Parent=p}) end
-local function _st(p,c,t) return _inst("UIStroke",{Color=c or TH.Ln,Thickness=t or 1,ApplyStrokeMode=_E.ApplyStrokeMode.Border,Parent=p}) end
-local function _pd(p,x) return _inst("UIPadding",{PaddingTop=UDim.new(0,x),PaddingBottom=UDim.new(0,x),PaddingLeft=UDim.new(0,x),PaddingRight=UDim.new(0,x),Parent=p}) end
-local function _tw(o,t,pr) local a=_T:Create(o,TweenInfo.new(t or .15,_E.EasingStyle.Quad,_E.EasingDirection.Out),pr); a:Play(); return a end
-local function _fk(c) return c.Flag or c.Name or ("_f"..math.random(1,1e8)) end
+function NovaUI:Create(config)
+	config = config or {}
+	local titleText = config.Name or "NovaUI Hub"
+	
+	-- ScreenGui Principal
+	local ScreenGui = Instance.new("ScreenGui")
+	ScreenGui.Name = "NovaUI_Main"
+	ScreenGui.ResetOnSpawn = false
+	
+	-- Protección para ejecutores si está disponible
+	if syn and syn.protect_gui then
+		syn.protect_gui(ScreenGui)
+		ScreenGui.Parent = CoreGui
+	else
+		pcall(function()
+			ScreenGui.Parent = CoreGui
+		end)
+	end
+	if not ScreenGui.Parent then
+		ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+	end
 
---=============================================================
---  MÉTODOS DE SECCIÓN
---=============================================================
-local S = {}
+	-- Botón flotante cuando está minimizado (Gui chica / "UI" Izquierda)
+	local MiniButton = Instance.new("TextButton")
+	MiniButton.Name = "MiniButton"
+	MiniButton.Size = UDim2.new(0, 50, 0, 50)
+	MiniButton.Position = UDim2.new(0, 20, 0.5, -25)
+	MiniButton.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+	MiniButton.Text = "UI"
+	MiniButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+	MiniButton.TextSize = 16
+	MiniButton.Font = Enum.Font.GothamBold
+	MiniButton.Visible = false
+	MiniButton.Parent = ScreenGui
 
-function S:Label(txt)
-    local l=_inst("TextLabel",{
-        Size=_ud2(1,0,0,20), BackgroundTransparency=1,
-        Text=txt or "Label", TextColor3=TH.Tx, Font=TH.Ft, TextSize=13,
-        TextXAlignment=_E.TextXAlignment.Left, Parent=self.Body})
-    return { Instance=l, Set=function(_,t) l.Text=t end }
-end
+	local MiniCorner = Instance.new("UICorner")
+	MiniCorner.CornerRadius = UDim.new(0, 12)
+	MiniCorner.Parent = MiniButton
 
-function S:Divider()
-    _inst("Frame",{Size=_ud2(1,0,0,1),BackgroundColor3=TH.Ln,BorderSizePixel=0,Parent=self.Body})
-end
+	local MiniStroke = Instance.new("UIStroke")
+	MiniStroke.Color = Color3.fromRGB(80, 80, 120)
+	MiniStroke.Thickness = 2
+	MiniStroke.Parent = MiniButton
 
-function S:Button(c)
-    c=c or {}
-    local b=_inst("TextButton",{
-        Size=_ud2(1,0,0,30), BackgroundColor3=TH.Bg3,
-        Text=c.Name or "Button", TextColor3=TH.Tx, Font=TH.Ft, TextSize=13,
-        AutoButtonColor=false, Parent=self.Body})
-    _cn(b,6)
-    b.MouseEnter:Connect(function() _tw(b,.12,{BackgroundColor3=TH.A}) end)
-    b.MouseLeave:Connect(function() _tw(b,.12,{BackgroundColor3=TH.Bg3}) end)
-    b.InputBegan:Connect(function(i)
-        if i.UserInputType==_E.UserInputType.Touch then _tw(b,.1,{BackgroundColor3=TH.A}) end
-    end)
-    b.InputEnded:Connect(function(i)
-        if i.UserInputType==_E.UserInputType.Touch then _tw(b,.1,{BackgroundColor3=TH.Bg3}) end
-    end)
-    b.MouseButton1Click:Connect(function() if c.Callback then task.spawn(c.Callback) end end)
-    return { Instance=b }
-end
+	-- Ventana Principal
+	local MainFrame = Instance.new("Frame")
+	MainFrame.Name = "MainFrame"
+	MainFrame.Size = UDim2.new(0, 480, 0, 320)
+	MainFrame.Position = UDim2.new(0.5, -240, 0.5, -160)
+	MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
+	MainFrame.BorderSizePixel = 0
+	MainFrame.ClipsDescendants = true
+	MainFrame.Parent = ScreenGui
 
-function S:Toggle(c)
-    c=c or {}
-    local k=_fk(c); local st=c.Default and true or false
-    local h=_inst("Frame",{Size=_ud2(1,0,0,26),BackgroundTransparency=1,Parent=self.Body})
-    _inst("TextLabel",{Size=_ud2(1,-50,1,0),BackgroundTransparency=1,Text=c.Name or "Toggle",
-        TextColor3=TH.Tx,Font=TH.Ft,TextSize=13,TextXAlignment=_E.TextXAlignment.Left,Parent=h})
-    local sw=_inst("TextButton",{Size=_ud2(0,36,0,18),Position=_ud2(1,-36,.5,-9),
-        BackgroundColor3=st and TH.A or TH.Bg3,Text="",AutoButtonColor=false,Parent=h})
-    _cn(sw,9)
-    local kn=_inst("Frame",{Size=_ud2(0,14,0,14),
-        Position=st and _ud2(1,-16,.5,-7) or _ud2(0,2,.5,-7),
-        BackgroundColor3=TH.Tx,BorderSizePixel=0,Parent=sw})
-    _cn(kn,7)
-    local o={Value=st}
-    local function set(v,sil)
-        o.Value=v; FL[k]=v
-        _tw(sw,.15,{BackgroundColor3=v and TH.A or TH.Bg3})
-        _tw(kn,.15,{Position=v and _ud2(1,-16,.5,-7) or _ud2(0,2,.5,-7)})
-        if not sil and c.Callback then task.spawn(c.Callback,v) end
-    end
-    sw.MouseButton1Click:Connect(function() set(not o.Value) end)
-    function o:Set(v) set(v,true) end
-    function o:Get() return o.Value end
-    set(st,true)
-    return o
-end
+	local MainCorner = Instance.new("UICorner")
+	MainCorner.CornerRadius = UDim.new(0, 8)
+	MainCorner.Parent = MainFrame
 
-function S:Slider(c)
-    c=c or {}
-    local k=_fk(c); local mn=c.Min or 0; local mx=c.Max or 100
-    local v=c.Default or mn; local dc=c.Decimals or 0
-    local h=_inst("Frame",{Size=_ud2(1,0,0,44),BackgroundTransparency=1,Parent=self.Body})
-    _inst("TextLabel",{Size=_ud2(1,-60,0,18),BackgroundTransparency=1,Text=c.Name or "Slider",
-        TextColor3=TH.Tx,Font=TH.Ft,TextSize=13,TextXAlignment=_E.TextXAlignment.Left,Parent=h})
-    local vl=_inst("TextLabel",{Size=_ud2(0,60,0,18),Position=_ud2(1,-60,0,0),BackgroundTransparency=1,
-        Text=tostring(v)..(c.Suffix or ""),TextColor3=TH.Sb,Font=TH.Ft,TextSize=13,
-        TextXAlignment=_E.TextXAlignment.Right,Parent=h})
-    local br=_inst("TextButton",{Size=_ud2(1,0,0,6),Position=_ud2(0,0,0,30),
-        BackgroundColor3=TH.Bg3,Text="",AutoButtonColor=false,BorderSizePixel=0,Parent=h})
-    _cn(br,3)
-    local fl=_inst("Frame",{Size=_ud2((v-mn)/(mx-mn),0,1,0),
-        BackgroundColor3=TH.A,BorderSizePixel=0,Parent=br})
-    _cn(fl,3)
-    local kn=_inst("Frame",{Size=_ud2(0,14,0,14),AnchorPoint=Vector2.new(.5,.5),
-        Position=_ud2((v-mn)/(mx-mn),0,.5,0),BackgroundColor3=TH.Tx,BorderSizePixel=0,ZIndex=2,Parent=br})
-    _cn(kn,7)
-    local o={Value=v}; local drag=false
-    local function commit(x)
-        x=math.clamp(x,mn,mx); local r=(x-mn)/(mx-mn)
-        o.Value=x; FL[k]=x
-        fl.Size=_ud2(r,0,1,0); kn.Position=_ud2(r,0,.5,0)
-        vl.Text=tostring(x)..(c.Suffix or "")
-        if c.Callback then task.spawn(c.Callback,x) end
-    end
-    local function fx(x)
-        local r=math.clamp((x-br.AbsolutePosition.X)/br.AbsoluteSize.X,0,1)
-        local raw=mn+r*(mx-mn); local m=10^dc
-        commit(math.floor(raw*m+.5)/m)
-    end
-    br.InputBegan:Connect(function(i)
-        if i.UserInputType==_E.UserInputType.MouseButton1 or i.UserInputType==_E.UserInputType.Touch then
-            drag=true; fx(i.Position.X)
-        end
-    end)
-    _U.InputChanged:Connect(function(i)
-        if drag and (i.UserInputType==_E.UserInputType.MouseMovement or i.UserInputType==_E.UserInputType.Touch) then
-            fx(i.Position.X)
-        end
-    end)
-    _U.InputEnded:Connect(function(i)
-        if i.UserInputType==_E.UserInputType.MouseButton1 or i.UserInputType==_E.UserInputType.Touch then drag=false end
-    end)
-    function o:Set(x) commit(x) end
-    function o:Get() return o.Value end
-    FL[k]=v
-    return o
-end
+	local MainStroke = Instance.new("UIStroke")
+	MainStroke.Color = Color3.fromRGB(50, 50, 70)
+	MainStroke.Thickness = 1.5
+	MainStroke.Parent = MainFrame
 
-function S:Dropdown(c)
-    c=c or {}
-    local k=_fk(c); local opts=c.Options or {}; local sel=c.Default or opts[1]
-    local wrap=_inst("Frame",{Size=_ud2(1,0,0,26),BackgroundTransparency=1,Parent=self.Body})
-    wrap.AutomaticSize = _E.AutomaticSize.Y
-    local row=_inst("Frame",{Size=_ud2(1,0,0,26),BackgroundTransparency=1,Parent=wrap})
-    _inst("TextLabel",{Size=_ud2(1,-130,1,0),BackgroundTransparency=1,Text=c.Name or "Dropdown",
-        TextColor3=TH.Tx,Font=TH.Ft,TextSize=13,TextXAlignment=_E.TextXAlignment.Left,Parent=row})
-    local bt=_inst("TextButton",{Size=_ud2(0,120,0,24),Position=_ud2(1,-120,.5,-12),
-        BackgroundColor3=TH.Bg3,Text=" "..tostring(sel).."  v",TextColor3=TH.Tx,
-        Font=TH.Ft,TextSize=12,TextXAlignment=_E.TextXAlignment.Left,AutoButtonColor=false,Parent=row})
-    _cn(bt,5)
-    local ls=_inst("ScrollingFrame",{Size=_ud2(1,0,0,0),Position=_ud2(0,0,0,28),
-        BackgroundColor3=TH.Bg3,BorderSizePixel=0,Visible=false,ScrollBarThickness=2,
-        ScrollBarImageColor3=TH.A,CanvasSize=_ud2(0,0,0,0),
-        AutomaticCanvasSize=_E.AutomaticSize.Y,Parent=wrap})
-    _cn(ls,5); _pd(ls,4)
-    _inst("UIListLayout",{SortOrder=_E.SortOrder.LayoutOrder,Padding=UDim.new(0,2),Parent=ls})
-    local o={Value=sel}
-    local function set(v,sil)
-        o.Value=v; FL[k]=v; bt.Text=" "..tostring(v).."  v"
-        if not sil and c.Callback then task.spawn(c.Callback,v) end
-    end
-    local function build()
-        for _,x in ipairs(opts) do
-            local ob=_inst("TextButton",{Size=_ud2(1,0,0,22),BackgroundTransparency=1,
-                Text=tostring(x),TextColor3=TH.Tx,Font=TH.Ft,TextSize=12,AutoButtonColor=true,Parent=ls})
-            ob.MouseButton1Click:Connect(function()
-                set(x); ls.Visible=false; ls.Size=_ud2(1,0,0,0); wrap.Size=_ud2(1,0,0,26)
-            end)
-        end
-    end
-    build()
-    bt.MouseButton1Click:Connect(function()
-        local opening=not ls.Visible
-        ls.Visible=opening
-        ls.Size = opening and _ud2(1,0,0,math.min(#opts*24+8,140)) or _ud2(1,0,0,0)
-        wrap.Size = opening and _ud2(1,0,0,26+math.min(#opts*24+8,140)+4) or _ud2(1,0,0,26)
-    end)
-    function o:Set(v) set(v,true) end
-    function o:Get() return o.Value end
-    function o:Refresh(nw)
-        opts=nw
-        for _,ch in ipairs(ls:GetChildren()) do if ch:IsA("TextButton") then ch:Destroy() end end
-        build()
-    end
-    set(sel,true)
-    return o
-end
+	-- Barra Superior (Topbar)
+	local TopBar = Instance.new("Frame")
+	TopBar.Name = "TopBar"
+	TopBar.Size = UDim2.new(1, 0, 0, 40)
+	TopBar.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+	TopBar.BorderSizePixel = E
+	TopBar.Parent = MainFrame
 
-function S:Input(c)
-    c=c or {}
-    local k=_fk(c)
-    local r=_inst("Frame",{Size=_ud2(1,0,0,26),BackgroundTransparency=1,Parent=self.Body})
-    _inst("TextLabel",{Size=_ud2(1,-130,1,0),BackgroundTransparency=1,Text=c.Name or "Input",
-        TextColor3=TH.Tx,Font=TH.Ft,TextSize=13,TextXAlignment=_E.TextXAlignment.Left,Parent=r})
-    local bx=_inst("TextBox",{Size=_ud2(0,120,0,24),Position=_ud2(1,-120,.5,-12),
-        BackgroundColor3=TH.Bg3,Text=c.Default or "",PlaceholderText=c.Placeholder or "Escribe...",
-        TextColor3=TH.Tx,PlaceholderColor3=TH.Sb,Font=TH.Ft,TextSize=12,
-        ClearTextOnFocus=false,Parent=r})
-    _cn(bx,5)
-    local o={Value=c.Default or ""}
-    bx.FocusLost:Connect(function()
-        o.Value=bx.Text; FL[k]=bx.Text
-        if c.Callback then task.spawn(c.Callback,bx.Text) end
-    end)
-    function o:Set(v) bx.Text=v; o.Value=v; FL[k]=v end
-    function o:Get() return o.Value end
-    FL[k]=o.Value
-    return o
-end
+	local TopBarCorner = Instance.new("UICorner")
+	TopBarCorner.CornerRadius = UDim.new(0, 8)
+	TopBarCorner.Parent = TopBar
 
-function S:Keybind(c)
-    c=c or {}
-    local k=_fk(c); local cur=c.Default or _E.KeyCode.RightControl; local lis=false
-    local r=_inst("Frame",{Size=_ud2(1,0,0,26),BackgroundTransparency=1,Parent=self.Body})
-    _inst("TextLabel",{Size=_ud2(1,-100,1,0),BackgroundTransparency=1,Text=c.Name or "Keybind",
-        TextColor3=TH.Tx,Font=TH.Ft,TextSize=13,TextXAlignment=_E.TextXAlignment.Left,Parent=r})
-    local bt=_inst("TextButton",{Size=_ud2(0,90,0,24),Position=_ud2(1,-90,.5,-12),
-        BackgroundColor3=TH.Bg3,Text=cur.Name,TextColor3=TH.Tx,Font=TH.Ft,TextSize=12,
-        AutoButtonColor=false,Parent=r})
-    _cn(bt,5)
-    local o={Value=cur}
-    bt.MouseButton1Click:Connect(function()
-        lis=true; bt.Text="..."; bt.BackgroundColor3=TH.A
-    end)
-    _U.InputBegan:Connect(function(i,g)
-        if g then return end
-        if lis then
-            if i.UserInputType==_E.UserInputType.Keyboard then
-                cur=i.KeyCode; o.Value=cur; bt.Text=cur.Name
-                bt.BackgroundColor3=TH.Bg3; lis=false; FL[k]=cur
-                if c.Callback then task.spawn(c.Callback,cur) end
-            end
-        elseif i.KeyCode==cur then
-            if c.OnPressed then task.spawn(c.OnPressed) end
-        end
-    end)
-    FL[k]=cur
-    return o
-end
+	-- Arreglar esquinas inferiores del TopBar para que sean rectas
+	local FixFrame = Instance.new("Frame")
+	FixFrame.Size = UDim2.new(1, 0, 0, 10)
+	FixFrame.Position = UDim2.new(0, 0, 1, -10)
+	FixFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+	FixFrame.BorderSizePixel = 0
+	FixFrame.Parent = TopBar
 
--- Aliases cortos
-S.Btn=S.Button; S.Tg=S.Toggle; S.Sl=S.Slider
-S.Dd=S.Dropdown; S.In=S.Input; S.Kb=S.Keybind
-S.Lb=S.Label;   S.Dv=S.Divider
+	-- Título
+	local Title = Instance.new("TextLabel")
+	Title.Size = UDim2.new(0, 200, 1, 0)
+	Title.Position = UDim2.new(0, 55, 0, 0)
+	Title.BackgroundTransparency = 1
+	Title.Text = titleText
+	Title.TextColor3 = Color3.fromRGB(240, 240, 255)
+	Title.TextSize = 14
+	Title.Font = Enum.Font.GothamBold
+	Title.TextXAlignment = Enum.TextXAlignment.Left
+	Title.Parent = TopBar
 
---=============================================================
---  NOTIFICACIONES
---=============================================================
-N._NotifScreen = nil
-N._NotifHolder = nil
+	-- Botón Minimizar "UI" (Izquierda)
+	local MinimizeBtn = Instance.new("TextButton")
+	MinimizeBtn.Size = UDim2.new(0, 35, 0, 26)
+	MinimizeBtn.Position = UDim2.new(0, 10, 0.5, -13)
+	MinimizeBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 55)
+	MinimizeBtn.Text = "UI"
+	MinimizeBtn.TextColor3 = Color3.fromRGB(200, 200, 220)
+	MinimizeBtn.TextSize = 12
+	MinimizeBtn.Font = Enum.Font.GothamBold
+	MinimizeBtn.Parent = TopBar
 
-local function _ensureNotifs()
-    if N._NotifScreen and N._NotifScreen.Parent then return end
-    local sg=_inst("ScreenGui",{
-        Name="NovaNotifs_",
-        ResetOnSpawn=false, IgnoreGuiInset=true,
-        DisplayOrder=1000, Parent=_parent()})
-    _protect(sg)
-    N._NotifScreen=sg
-    N._NotifHolder=_inst("Frame",{
-        Name="Holder",
-        Size=_ud2(0,300,0,500),
-        Position=_ud2(1,-20,0,20),
-        AnchorPoint=Vector2.new(1,0),
-        BackgroundTransparency=1,
-        Parent=sg})
-    _inst("UIListLayout",{
-        SortOrder=_E.SortOrder.LayoutOrder,
-        Padding=UDim.new(0,8),
-        HorizontalAlignment=_E.HorizontalAlignment.Right,
-        VerticalAlignment=_E.VerticalAlignment.Top,
-        Parent=N._NotifHolder})
+	local MinCorner = Instance.new("UICorner")
+	MinCorner.CornerRadius = UDim.new(0, 6)
+	MinCorner.Parent = MinimizeBtn
+
+	-- Botón Eliminar / Cerrar (Derecha)
+	local CloseBtn = Instance.new("TextButton")
+	CloseBtn.Size = UDim2.new(0, 26, 0, 26)
+	CloseBtn.Position = UDim2.new(1, -35, 0.5, -13)
+	CloseBtn.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
+	CloseBtn.Text = "X"
+	CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	CloseBtn.TextSize = 12
+	CloseBtn.Font = Enum.Font.GothamBold
+	CloseBtn.Parent = TopBar
+
+	local CloseCorner = Instance.new("UICorner")
+	CloseCorner.CornerRadius = UDim.new(0, 6)
+	CloseCorner.Parent = CloseBtn
+
+	-- Contenedor de Contenido
+	local Container = Instance.new("ScrollingFrame")
+	Container.Size = UDim2.new(1, -20, 1, -55)
+	Container.Position = UDim2.new(0, 10, 0, 45)
+	Container.BackgroundTransparency = 1
+	Container.BorderSizePixel = 0
+	Container.CanvasSize = UDim2.new(0, 0, 0, 0)
+	Container.ScrollBarThickness = 4
+	Container.Parent = MainFrame
+
+	local UIList = Instance.new("UIListLayout")
+	UIList.SortOrder = Enum.SortOrder.LayoutOrder
+	UIList.Padding = UDim.new(0, 8)
+	UIList.Parent = Container
+
+	UIList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+		Container.CanvasSize = UDim2.new(0, 0, 0, UIList.AbsoluteContentSize.Y + 10)
+	end)
+
+	-- Sistema de arrastre (Dragging)
+	local dragging, dragInput, dragStart, startPos
+	TopBar.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = MainFrame.Position
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+
+	UserInputService.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+
+	game:GetService("RunService").RenderStepped:Connect(function()
+		if dragging and dragInput then
+			local delta = dragInput.Position - dragStart
+			MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+		end
+	end)
+
+	-- Animación y Lógica de Minimizar / Restaurar
+	local minimized = false
+	local function toggleMinimize()
+		minimized = not minimized
+		if minimized then
+			tween(MainFrame, 0.3, {Size = UDim2.new(0, 0, 0, 0), Transparency = 1})
+			task.wait(0.15)
+			MainFrame.Visible = false
+			MiniButton.Visible = true
+			tween(MiniButton, 0.3, {Size = UDim2.new(0, 50, 0, 50)})
+		else
+			MiniButton.Visible = false
+			MainFrame.Visible = true
+			tween(MainFrame, 0.3, {Size = UDim2.new(0, 480, 0, 320), Transparency = 0})
+		end
+	end
+
+	MinimizeBtn.MouseButton1Click:Connect(toggleMinimize)
+	MiniButton.MouseButton1Click:Connect(toggleMinimize)
+
+	-- Lógica de Eliminar (Cerrar completamente)
+	CloseBtn.MouseButton1Click:Connect(function()
+		tween(MainFrame, 0.2, {Size = UDim2.new(0, 0, 0, 0)})
+		task.wait(0.2)
+		ScreenGui:Destroy()
+	end)
+
+	-- API de Componentes para la ventana
+	local Window = {}
+
+	function Window:AddButton(text, callback)
+		local Btn = Instance.new("TextButton")
+		Btn.Size = UDim2.new(1, 0, 0, 35)
+		Btn.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
+		Btn.Text = "  " .. text
+		Btn.TextColor3 = Color3.fromRGB(220, 220, 240)
+		Btn.TextSize = 13
+		Btn.Font = Enum.Font.Gotham
+		Btn.TextXAlignment = Enum.TextXAlignment.Left
+		Btn.Parent = Container
+
+		local BtnCorner = Instance.new("UICorner")
+		BtnCorner.CornerRadius = UDim.new(0, 6)
+		BtnCorner.Parent = Btn
+
+		Btn.MouseButton1Click:Connect(function()
+			pcall(callback)
+			-- Animación de clic
+			tween(Btn, 0.1, {BackgroundColor3 = Color3.fromRGB(50, 50, 75)})
+			task.wait(0.1)
+			tween(Btn, 0.1, {BackgroundColor3 = Color3.fromRGB(30, 30, 42)})
+		end)
+	end
+
+	return Window
 end
 
-function N:Notify(c)
-    c=c or {}
-    _ensureNotifs()
-    local ac=TH.A
-    if c.Type=="Success" then ac=TH.Ok
-    elseif c.Type=="Warning" then ac=TH.Wn
-    elseif c.Type=="Error" then ac=TH.Er end
-    local cg=_inst("CanvasGroup",{Size=_udo(280,62),BackgroundTransparency=1,Parent=N._NotifHolder})
-    cg.GroupTransparency=1
-    local fr=_inst("Frame",{Size=_ud2(1,0,1,0),BackgroundColor3=TH.Bg2,BorderSizePixel=0,Parent=cg})
-    _cn(fr,8); _st(fr,TH.Ln,1)
-    local bar=_inst("Frame",{Size=_ud2(0,3,1,-16),Position=_ud2(0,8,0,8),
-        BackgroundColor3=ac,BorderSizePixel=0,Parent=fr})
-    _cn(bar,2)
-    _inst("TextLabel",{Size=_ud2(1,-30,0,18),Position=_ud2(0,20,0,8),BackgroundTransparency=1,
-        Text=c.Title or "Notificacion",TextColor3=TH.Tx,Font=_F.GothamBold,TextSize=13,
-        TextXAlignment=_E.TextXAlignment.Left,Parent=fr})
-    _inst("TextLabel",{Size=_ud2(1,-30,0,30),Position=_ud2(0,20,0,26),BackgroundTransparency=1,
-        Text=c.Content or "",TextColor3=TH.Sb,Font=TH.Ft,TextSize=12,TextWrapped=true,
-        TextXAlignment=_E.TextXAlignment.Left,TextYAlignment=_E.TextYAlignment.Top,Parent=fr})
-    _tw(cg,.28,{GroupTransparency=0})
-    task.delay(c.Duration or 3,function()
-        _tw(cg,.28,{GroupTransparency=1})
-        task.wait(.35); cg:Destroy()
-    end)
-end
-N.Nf=N.Notify
-
---=============================================================
---  KEYSYSTEM
---=============================================================
-function N:_showKeySystem(cfg,onSuccess)
-    local sg=_inst("ScreenGui",{
-        Name="NovaKeySys",
-        ResetOnSpawn=false, IgnoreGuiInset=true,
-        ZIndexBehavior=_E.ZIndexBehavior.Sibling,
-        DisplayOrder=9999, Parent=_parent()})
-    _protect(sg)
-
-    _inst("Frame",{Size=_ud2(1,0,1,0),BackgroundColor3=_rgb(0,0,0),
-        BackgroundTransparency=.45,BorderSizePixel=0,Parent=sg})
-
-    local card=_inst("Frame",{
-        Size=_udo(340,250),
-        Position=_ud2(.5,0,.5,0),
-        AnchorPoint=Vector2.new(.5,.5),
-        BackgroundColor3=TH.Bg,
-        BorderSizePixel=0, Parent=sg})
-    _cn(card,12); _st(card,TH.Ln,1)
-
-    _inst("TextLabel",{Size=_ud2(1,-40,0,26),Position=_ud2(0,20,0,20),
-        BackgroundTransparency=1,Text=cfg.Name or "Key System",
-        TextColor3=TH.Tx,Font=_F.GothamBold,TextSize=18,Parent=card})
-    _inst("TextLabel",{Size=_ud2(1,-40,0,18),Position=_ud2(0,20,0,48),
-        BackgroundTransparency=1,Text=cfg.Subtitle or "Introduce tu clave",
-        TextColor3=TH.Sb,Font=TH.Ft,TextSize=12,Parent=card})
-
-    local box=_inst("TextBox",{
-        Size=_ud2(1,-40,0,36),
-        Position=_ud2(0,20,0,95),
-        BackgroundColor3=TH.Bg3,
-        Text="",
-        PlaceholderText="Escribe la clave aqui...",
-        TextColor3=TH.Tx, PlaceholderColor3=TH.Sb,
-        Font=TH.Ft, TextSize=14, ClearTextOnFocus=false,
-        Parent=card})
-    _cn(box,8); _st(box,TH.Ln,1)
-
-    local status=_inst("TextLabel",{
-        Size=_ud2(1,-40,0,18),Position=_ud2(0,20,0,136),
-        BackgroundTransparency=1,Text="",
-        TextColor3=TH.Er,Font=TH.Ft,TextSize=12,Parent=card})
-
-    local btn=_inst("TextButton",{
-        Size=_ud2(1,-40,0,38),
-        Position=_ud2(0,20,0,165),
-        BackgroundColor3=TH.A,
-        Text="Verificar", TextColor3=TH.Tx,
-        Font=_F.GothamBold, TextSize=14,
-        AutoButtonColor=false, Parent=card})
-    _cn(btn,8)
-
-    local keys=cfg.Keys or {"mateo2024"}
-    if type(keys)=="string" then keys={keys} end
-
-    local function shake()
-        local op=card.Position
-        for i=1,5 do
-            local off=(i%2==0) and 8 or -8
-            card.Position=op+_udo(off,0)
-            task.wait(.04)
-        end
-        card.Position=op
-    end
-
-    local function verify()
-        local typed=box.Text
-        local ok=false
-        for _,k in ipairs(keys) do
-            if typed==k then ok=true; break end
-        end
-        if ok then
-            status.Text="Correcto! Cargando..."
-            status.TextColor3=TH.Ok
-            _tw(card,.25,{BackgroundTransparency=1})
-            task.wait(.28)
-            sg:Destroy()
-            if onSuccess then task.spawn(onSuccess) end
-        else
-            status.Text="Clave incorrecta"
-            status.TextColor3=TH.Er
-            box.Text=""
-            shake()
-        end
-    end
-
-    btn.MouseButton1Click:Connect(verify)
-    box.FocusLost:Connect(function(e) if e then verify() end end)
-end
-
---=============================================================
---  CONSTRUCTOR DE VENTANA
---=============================================================
-function N:_buildWindow(cfg)
-    local name     = cfg.Name or "NovaUI"
-    local subtitle = cfg.Subtitle or ""
-    local w,h = 580,380
-    if cfg.Size then
-        w = cfg.Size.X.Offset > 0 and cfg.Size.X.Offset or w
-        h = cfg.Size.Y.Offset > 0 and cfg.Size.Y.Offset or h
-    end
-    local fullSize=_udo(w,h)
-
-    local parent=_parent()
-    local sg=_inst("ScreenGui",{
-        Name="NovaUI_"..tostring(math.random(1000,9999)),
-        ResetOnSpawn=false, IgnoreGuiInset=true,
-        ZIndexBehavior=_E.ZIndexBehavior.Sibling,
-        DisplayOrder=999, Parent=parent})
-    _protect(sg)
-
-    N.Screens = N.Screens or {}
-    table.insert(N.Screens, sg)
-    N.Screen = sg
-
-    local main=_inst("Frame",{
-        Name="Main", Size=fullSize,
-        Position=_ud2(.5,0,.5,0), AnchorPoint=Vector2.new(.5,.5),
-        BackgroundColor3=TH.Bg, BorderSizePixel=0, Parent=sg})
-    _cn(main,10); _st(main,TH.Ln,1)
-
-    -- Topbar
-    local tb=_inst("Frame",{Size=_ud2(1,0,0,38),BackgroundColor3=TH.Bg2,BorderSizePixel=0,Parent=main})
-    _cn(tb,10)
-    _inst("Frame",{Size=_ud2(1,0,0,10),Position=_ud2(0,0,1,-10),
-        BackgroundColor3=TH.Bg2,BorderSizePixel=0,Parent=tb})
-
-    _inst("TextLabel",{Size=_ud2(1,-100,0,18),Position=_ud2(0,16,0,3),BackgroundTransparency=1,
-        Text=name, TextColor3=TH.Tx, Font=_F.GothamBold, TextSize=15,
-        TextXAlignment=_E.TextXAlignment.Left, Parent=tb})
-    _inst("TextLabel",{Size=_ud2(1,-100,0,12),Position=_ud2(0,16,0,20),BackgroundTransparency=1,
-        Text=subtitle, TextColor3=TH.Sb, Font=TH.Ft, TextSize=11,
-        TextXAlignment=_E.TextXAlignment.Left, Parent=tb})
-
-    -- Cerrar
-    local clsB=_inst("TextButton",{Size=_ud2(0,28,0,28),Position=_ud2(1,-36,.5,-14),
-        BackgroundColor3=TH.Er,Text="x",TextColor3=TH.Tx,Font=_F.GothamBold,TextSize=16,
-        AutoButtonColor=false,Parent=tb})
-    _cn(clsB,6)
-
-    -- Sidebar
-    local sb=_inst("Frame",{Size=_ud2(0,150,1,-38),Position=_ud2(0,0,0,38),
-        BackgroundColor3=TH.Bg,BorderSizePixel=0,Parent=main})
-    local tl=_inst("ScrollingFrame",{Size=_ud2(1,-10,1,-10),Position=_ud2(0,5,0,5),
-        BackgroundTransparency=1,BorderSizePixel=0,ScrollBarThickness=2,
-        ScrollBarImageColor3=TH.A,CanvasSize=_ud2(0,0,0,0),
-        AutomaticCanvasSize=_E.AutomaticSize.Y,Parent=sb})
-    _inst("UIListLayout",{SortOrder=_E.SortOrder.LayoutOrder,Padding=UDim.new(0,4),Parent=tl})
-
-    -- Contenido
-    local ct=_inst("Frame",{Size=_ud2(1,-150,1,-38),Position=_ud2(0,150,0,38),
-        BackgroundTransparency=1,Parent=main})
-
-    -- Drag
-    local dr,ds,dp
-    tb.InputBegan:Connect(function(i)
-        if i.UserInputType==_E.UserInputType.MouseButton1 or i.UserInputType==_E.UserInputType.Touch then
-            dr=true; ds=i.Position; dp=main.Position
-        end
-    end)
-    _U.InputChanged:Connect(function(i)
-        if dr and (i.UserInputType==_E.UserInputType.MouseMovement or i.UserInputType==_E.UserInputType.Touch) then
-            local d=i.Position-ds
-            main.Position=_ud2(dp.X.Scale,dp.X.Offset+d.X,dp.Y.Scale,dp.Y.Offset+d.Y)
-        end
-    end)
-    _U.InputEnded:Connect(function(i)
-        if i.UserInputType==_E.UserInputType.MouseButton1 or i.UserInputType==_E.UserInputType.Touch then dr=false end
-    end)
-
-    -- Cerrar botón
-    clsB.MouseButton1Click:Connect(function()
-        _tw(main,.15,{BackgroundTransparency=1})
-        task.wait(.18); sg:Destroy()
-    end)
-
-    -- Toggle RightShift
-    _U.InputBegan:Connect(function(i,g)
-        if g then return end
-        if i.KeyCode==_E.KeyCode.RightShift then main.Visible=not main.Visible end
-    end)
-
-    -- Botón flotante UI
-    local uiB=_inst("TextButton",{
-        Name="UI_Toggle",
-        Size=_udo(38,38),
-        Position=_ud2(0,10,.15,0),
-        BackgroundColor3=TH.A,
-        BackgroundTransparency=.15,
-        Text="UI", TextColor3=TH.Tx,
-        Font=_F.GothamBold, TextSize=13,
-        AutoButtonColor=false, Parent=sg})
-    _cn(uiB,19); _st(uiB,TH.Ln,1)
-    uiB.MouseEnter:Connect(function() _tw(uiB,.12,{BackgroundTransparency=0}) end)
-    uiB.MouseLeave:Connect(function() _tw(uiB,.12,{BackgroundTransparency=.15}) end)
-
-    local udr,uds,udp,dragMoved=false,nil,nil,false
-    uiB.InputBegan:Connect(function(i)
-        if i.UserInputType==_E.UserInputType.MouseButton1 or i.UserInputType==_E.UserInputType.Touch then
-            udr=true; uds=i.Position; udp=uiB.Position; dragMoved=false
-        end
-    end)
-    _U.InputChanged:Connect(function(i)
-        if udr and (i.UserInputType==_E.UserInputType.MouseMovement or i.UserInputType==_E.UserInputType.Touch) then
-            local d=i.Position-uds
-            if d.Magnitude>4 then dragMoved=true end
-            uiB.Position=_ud2(udp.X.Scale,udp.X.Offset+d.X,udp.Y.Scale,udp.Y.Offset+d.Y)
-        end
-    end)
-    _U.InputEnded:Connect(function(i)
-        if i.UserInputType==_E.UserInputType.MouseButton1 or i.UserInputType==_E.UserInputType.Touch then udr=false end
-    end)
-    uiB.MouseButton1Click:Connect(function()
-        if not dragMoved then main.Visible=not main.Visible end
-    end)
-
-    -- API
-    local W={Gui=sg, Main=main, Tabs={}, UIToggle=uiB}
-
-    function W:CreateTab(tname)
-        local b=_inst("TextButton",{Size=_ud2(1,0,0,32),
-            BackgroundColor3=TH.Bg,BackgroundTransparency=.4,
-            Text="  "..(tname or "Tab"),TextColor3=TH.Sb,
-            Font=_F.GothamMedium,TextSize=13,TextXAlignment=_E.TextXAlignment.Left,
-            AutoButtonColor=false,Parent=tl})
-        _cn(b,6)
-
-        local ctr=_inst("ScrollingFrame",{Size=_ud2(1,-20,1,-20),Position=_ud2(0,10,0,10),
-            BackgroundTransparency=1,BorderSizePixel=0,ScrollBarThickness=3,
-            ScrollBarImageColor3=TH.A,CanvasSize=_ud2(0,0,0,0),
-            AutomaticCanvasSize=_E.AutomaticSize.Y,Visible=false,Parent=ct})
-        _inst("UIListLayout",{SortOrder=_E.SortOrder.LayoutOrder,Padding=UDim.new(0,8),Parent=ctr})
-
-        local Tb={Button=b,Container=ctr}
-
-        b.MouseButton1Click:Connect(function()
-            for _,t in ipairs(W.Tabs) do
-                t.Button.BackgroundColor3=TH.Bg
-                t.Button.BackgroundTransparency=.4
-                t.Button.TextColor3=TH.Sb
-                t.Container.Visible=false
-            end
-            b.BackgroundColor3=TH.A; b.BackgroundTransparency=0
-            b.TextColor3=TH.Tx; ctr.Visible=true
-        end)
-
-        function Tb:CreateSection(sName)
-            -- Frame sección con UIListLayout interno (fix del bug)
-            local sf=_inst("Frame",{
-                Size=_ud2(1,0,0,0),
-                BackgroundTransparency=1,
-                Parent=ctr})
-            sf.AutomaticSize=_E.AutomaticSize.Y
-            _inst("UIListLayout",{
-                SortOrder=_E.SortOrder.LayoutOrder,
-                Padding=UDim.new(0,4),
-                Parent=sf})
-
-            _inst("TextLabel",{
-                Size=_ud2(1,0,0,20),
-                BackgroundTransparency=1,
-                Text=sName or "Section",
-                TextColor3=TH.Sb,
-                Font=_F.GothamBold,
-                TextSize=12,
-                TextXAlignment=_E.TextXAlignment.Left,
-                LayoutOrder=1,
-                Parent=sf})
-
-            local body=_inst("Frame",{
-                Size=_ud2(1,0,0,0),
-                BackgroundColor3=TH.Bg2,
-                BorderSizePixel=0,
-                LayoutOrder=2,
-                Parent=sf})
-            _cn(body,8); _st(body,TH.Ln,1); _pd(body,8)
-            body.AutomaticSize=_E.AutomaticSize.Y
-            _inst("UIListLayout",{
-                SortOrder=_E.SortOrder.LayoutOrder,
-                Padding=UDim.new(0,6),
-                Parent=body})
-
-            return setmetatable({Body=body},{__index=S})
-        end
-
-        -- Aliases
-        Tb.T = Tb.CreateTab
-        Tb.S = Tb.CreateSection
-
-        table.insert(W.Tabs,Tb)
-        if #W.Tabs==1 then
-            b.BackgroundColor3=TH.A; b.BackgroundTransparency=0
-            b.TextColor3=TH.Tx; ctr.Visible=true
-        end
-        return Tb
-    end
-
-    -- Aliases de ventana
-    W.T = W.CreateTab
-
-    N.Window=W
-    return W
-end
-
---=============================================================
---  CREATEWINDOW (con soporte de KeySystem)
---=============================================================
-function N:CreateWindow(cfg)
-    cfg = cfg or {}
-    local W = self:_buildWindow(cfg)
-    if cfg.KeySystem then
-        W.Gui.Enabled = false
-        self:_showKeySystem(cfg, function()
-            W.Gui.Enabled = true
-            self:Notify({
-                Title = cfg.Name or "NovaUI",
-                Content = "Clave correcta. Bienvenido!",
-                Type = "Success",
-                Duration = 3,
-            })
-        end)
-    end
-    return W
-end
-N.W = N.CreateWindow
-
---=============================================================
---  EXPORT GLOBAL
---=============================================================
-_G.CreateWindow = function(cfg)
-    return N:CreateWindow(cfg)
-end
-_G.NovaUI = N
-
-return N
+return NovaUI
