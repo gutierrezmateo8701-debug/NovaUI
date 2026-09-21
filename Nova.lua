@@ -1,5 +1,5 @@
 --[[
-    NovaUI Library - Corregido y optimizado para ejecutores
+    NovaUI Library - Versión Completa (Pestañas, Sliders, Horizontal)
 ]]
 
 local TweenService = game:GetService("TweenService")
@@ -20,7 +20,6 @@ function NovaUI:Create(config)
 	config = config or {}
 	local titleText = config.Name or "NovaUI Hub"
 	
-	-- Limpiar instancias anteriores si existen para evitar duplicados invisibles
 	if LocalPlayer.PlayerGui:FindFirstChild("NovaUI_Main") then
 		LocalPlayer.PlayerGui.NovaUI_Main:Destroy()
 	end
@@ -28,13 +27,11 @@ function NovaUI:Create(config)
 		CoreGui.NovaUI_Main:Destroy()
 	end
 
-	-- ScreenGui Principal
 	local ScreenGui = Instance.new("ScreenGui")
 	ScreenGui.Name = "NovaUI_Main"
 	ScreenGui.ResetOnSpawn = false
 	
-	-- Intentar parentar de forma segura
-	local success = pcall(function()
+	pcall(function()
 		if syn and syn.protect_gui then
 			syn.protect_gui(ScreenGui)
 			ScreenGui.Parent = CoreGui
@@ -43,11 +40,11 @@ function NovaUI:Create(config)
 		end
 	end)
 	
-	if not success or not ScreenGui.Parent then
+	if not ScreenGui.Parent then
 		ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 	end
 
-	-- Botón flotante minimizado (Gui chica / "UI" Izquierda)
+	-- Botón flotante minimizado ("UI" Izquierda)
 	local MiniButton = Instance.new("TextButton")
 	MiniButton.Name = "MiniButton"
 	MiniButton.Size = UDim2.new(0, 50, 0, 50)
@@ -70,11 +67,11 @@ function NovaUI:Create(config)
 	MiniStroke.Thickness = 2
 	MiniStroke.Parent = MiniButton
 
-	-- Ventana Principal
+	-- Ventana Principal (Gui acostada / Ancha: 580x340)
 	local MainFrame = Instance.new("Frame")
 	MainFrame.Name = "MainFrame"
-	MainFrame.Size = UDim2.new(0, 480, 0, 320)
-	MainFrame.Position = UDim2.new(0.5, -240, 0.5, -160)
+	MainFrame.Size = UDim2.new(0, 580, 0, 340)
+	MainFrame.Position = UDim2.new(0.5, -290, 0.5, -170)
 	MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
 	MainFrame.BorderSizePixel = 0
 	MainFrame.ClipsDescendants = true
@@ -156,25 +153,30 @@ function NovaUI:Create(config)
 	CloseCorner.CornerRadius = UDim.new(0, 6)
 	CloseCorner.Parent = CloseBtn
 
-	-- Contenedor
-	local Container = Instance.new("ScrollingFrame")
-	Container.Size = UDim2.new(1, -20, 1, -55)
-	Container.Position = UDim2.new(0, 10, 0, 45)
-	Container.BackgroundTransparency = 1
-	Container.BorderSizePixel = 0
-	Container.CanvasSize = UDim2.new(0, 0, 0, 0)
-	Container.ScrollBarThickness = 4
-	Container.ZIndex = 6
-	Container.Parent = MainFrame
+	-- Contenedor de Pestañas (Lateral Izquierdo)
+	local TabContainer = Instance.new("ScrollingFrame")
+	TabContainer.Size = UDim2.new(0, 130, 1, -55)
+	TabContainer.Position = UDim2.new(0, 10, 0, 45)
+	TabContainer.BackgroundTransparency = 1
+	TabContainer.BorderSizePixel = 0
+	TabContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
+	TabContainer.ScrollBarThickness = 2
+	TabContainer.ZIndex = 6
+	TabContainer.Parent = MainFrame
 
-	local UIList = Instance.new("UIListLayout")
-	UIList.SortOrder = Enum.SortOrder.LayoutOrder
-	UIList.Padding = UDim.new(0, 8)
-	UIList.Parent = Container
+	local TabList = Instance.new("UIListLayout")
+	TabList.SortOrder = Enum.SortOrder.LayoutOrder
+	TabList.Padding = UDim.new(0, 6)
+	TabList.Parent = TabContainer
 
-	UIList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-		Container.CanvasSize = UDim2.new(0, 0, 0, UIList.AbsoluteContentSize.Y + 10)
+	TabList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+		TabContainer.CanvasSize = UDim2.new(0, 0, 0, TabList.AbsoluteContentSize.Y + 10)
 	end)
+
+	-- Contenedor de Páginas (Derecha)
+	local PagesFolder = Instance.new("Folder")
+	PagesFolder.Name = "PagesFolder"
+	PagesFolder.Parent = MainFrame
 
 	-- Arrastrar ventana
 	local dragging, dragInput, dragStart, startPos
@@ -216,7 +218,7 @@ function NovaUI:Create(config)
 		else
 			MiniButton.Visible = false
 			MainFrame.Visible = true
-			tween(MainFrame, 0.3, {Size = UDim2.new(0, 480, 0, 320)})
+			tween(MainFrame, 0.3, {Size = UDim2.new(0, 580, 0, 340)})
 		end
 	end
 
@@ -228,28 +230,206 @@ function NovaUI:Create(config)
 		ScreenGui:Destroy()
 	end)
 
-	-- Ventana API
+	-- API de Pestañas y Componentes
 	local Window = {}
+	local firstTab = true
 
-	function Window:AddButton(text, callback)
-		local Btn = Instance.new("TextButton")
-		Btn.Size = UDim2.new(1, 0, 0, 35)
-		Btn.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
-		Btn.Text = "  " .. text
-		Btn.TextColor3 = Color3.fromRGB(220, 220, 240)
-		Btn.TextSize = 13
-		Btn.Font = Enum.Font.Gotham
-		Btn.TextXAlignment = Enum.TextXAlignment.Left
-		Btn.ZIndex = 6
-		Btn.Parent = Container
+	function Window:AddTab(tabName)
+		local TabButton = Instance.new("TextButton")
+		TabButton.Size = UDim2.new(1, 0, 0, 32)
+		TabButton.BackgroundColor3 = Color3.fromRGB(28, 28, 38)
+		TabButton.Text = "  " .. tabName
+		TabButton.TextColor3 = Color3.fromRGB(160, 160, 180)
+		TabButton.TextSize = 12
+		TabButton.Font = Enum.Font.GothamMedium
+		TabButton.TextXAlignment = Enum.TextXAlignment.Left
+		TabButton.ZIndex = 6
+		TabButton.Parent = TabContainer
 
-		local BtnCorner = Instance.new("UICorner")
-    BtnCorner.CornerRadius = UDim.new(0, 6)
-		BtnCorner.Parent = Btn
+		local TabCorner = Instance.new("UICorner")
+		TabCorner.CornerRadius = UDim.new(0, 6)
+		TabCorner.Parent = TabButton
 
-		Btn.MouseButton1Click:Connect(function()
-			pcall(callback)
+		-- Página de contenido para esta pestaña
+		local Page = Instance.new("ScrollingFrame")
+		Page.Size = UDim2.new(1, -155, 1, -55)
+		Page.Position = UDim2.new(0, 150, 0, 45)
+		Page.BackgroundTransparency = 1
+		Page.BorderSizePixel = 0
+		Page.CanvasSize = UDim2.new(0, 0, 0, 0)
+		Page.ScrollBarThickness = 4
+		Page.Visible = false
+		Page.ZIndex = 6
+		Page.Parent = MainFrame
+
+		local PageList = Instance.new("UIListLayout")
+		PageList.SortOrder = Enum.SortOrder.LayoutOrder
+		PageList.Padding = UDim.new(0, 8)
+		PageList.Parent = Page
+
+		PageList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+			Page.CanvasSize = UDim2.new(0, 0, 0, PageList.AbsoluteContentSize.Y + 10)
 		end)
+
+		if firstTab then
+			firstTab = false
+			Page.Visible = true
+			TabButton.BackgroundColor3 = Color3.fromRGB(50, 50, 75)
+			TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+		end
+
+		TabButton.MouseButton1Click:Connect(function()
+			for _, p in pairs(PagesFolder:GetChildren()) do
+				if p:IsA("ScrollingFrame") then p.Visible = false end
+			end
+			for _, b in pairs(TabContainer:GetChildren()) do
+				if b:IsA("TextButton") then
+					b.BackgroundColor3 = Color3.fromRGB(28, 28, 38)
+					b.TextColor3 = Color3.fromRGB(160, 160, 180)
+				end
+			end
+			Page.Visible = true
+			TabButton.BackgroundColor3 = Color3.fromRGB(50, 50, 75)
+			TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+		end)
+
+		local TabAPI = {}
+
+		-- Botón con etiqueta al costado derecho ("Button")
+		function TabAPI:AddButton(text, sideText, callback)
+			local Btn = Instance.new("TextButton")
+			Btn.Size = UDim2.new(1, 0, 0, 35)
+			Btn.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
+			Btn.Text = "  " .. text
+			Btn.TextColor3 = Color3.fromRGB(220, 220, 240)
+			Btn.TextSize = 13
+			Btn.Font = Enum.Font.Gotham
+			Btn.TextXAlignment = Enum.TextXAlignment.Left
+			Btn.ZIndex = 6
+			Btn.Parent = Page
+
+			local BtnCorner = Instance.new("UICorner")
+			BtnCorner.CornerRadius = UDim.new(0, 6)
+			BtnCorner.Parent = Btn
+
+			if sideText then
+				local SideLabel = Instance.new("TextLabel")
+				SideLabel.Size = UDim2.new(0, 80, 1, 0)
+				SideLabel.Position = UDim2.new(1, -85, 0, 0)
+				SideLabel.BackgroundTransparency = 1
+				SideLabel.Text = sideText
+				SideLabel.TextColor3 = Color3.fromRGB(130, 130, 160)
+				SideLabel.TextSize = 11
+				SideLabel.Font = Enum.Font.GothamBold
+				SideLabel.TextXAlignment = Enum.TextXAlignment.Right
+				SideLabel.ZIndex = 7
+				SideLabel.Parent = Btn
+			end
+
+			Btn.MouseButton1Click:Connect(function()
+				pcall(callback)
+				tween(Btn, 0.1, {BackgroundColor3 = Color3.fromRGB(50, 50, 75)})
+				task.wait(0.1)
+				tween(Btn, 0.1, {BackgroundColor3 = Color3.fromRGB(30, 30, 42)})
+			end)
+		end
+
+		-- Slider
+		function TabAPI:AddSlider(text, min, max, default, callback)
+			min = min or 0
+			max = max or 100
+			default = default or min
+
+			local SliderFrame = Instance.new("Frame")
+			SliderFrame.Size = UDim2.new(1, 0, 0, 50)
+			SliderFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
+			SliderFrame.ZIndex = 6
+			SliderFrame.Parent = Page
+
+			local SliderCorner = Instance.new("UICorner")
+			SliderCorner.CornerRadius = UDim.new(0, 6)
+			SliderCorner.Parent = SliderFrame
+
+			local Label = Instance.new("TextLabel")
+			Label.Size = UDim2.new(1, -20, 0, 22)
+			Label.Position = UDim2.new(0, 10, 0, 4)
+			Label.BackgroundTransparency = 1
+			Label.Text = text
+			Label.TextColor3 = Color3.fromRGB(220, 220, 240)
+			Label.TextSize = 12
+			Label.Font = Enum.Font.Gotham
+			Label.TextXAlignment = Enum.TextXAlignment.Left
+			Label.ZIndex = 7
+			Label.Parent = SliderFrame
+
+			local ValueLabel = Instance.new("TextLabel")
+			ValueLabel.Size = UDim2.new(0, 50, 0, 22)
+			ValueLabel.Position = UDim2.new(1, -60, 0, 4)
+			ValueLabel.BackgroundTransparency = 1
+			ValueLabel.Text = tostring(default)
+			ValueLabel.TextColor3 = Color3.fromRGB(150, 150, 180)
+			ValueLabel.TextSize = 12
+			ValueLabel.Font = Enum.Font.GothamBold
+			ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
+			ValueLabel.ZIndex = 7
+			ValueLabel.Parent = SliderFrame
+
+			local SliderBar = Instance.new("Frame")
+			SliderBar.Size = UDim2.new(1, -20, 0, 6)
+			SliderBar.Position = UDim2.new(0, 10, 0, 32)
+			SliderBar.BackgroundColor3 = Color3.fromRGB(45, 45, 65)
+			SliderBar.BorderSizePixel = 0
+			SliderBar.ZIndex = 7
+			SliderBar.Parent = SliderFrame
+
+			local BarCorner = Instance.new("UICorner")
+			BarCorner.CornerRadius = UDim.new(0, 3)
+			BarCorner.Parent = SliderBar
+
+			local Fill = Instance.new("Frame")
+			Fill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
+			Fill.BackgroundColor3 = Color3.fromRGB(100, 100, 220)
+			Fill.BorderSizePixel = 0
+			Fill.ZIndex = 8
+			Fill.Parent = SliderBar
+
+			local FillCorner = Instance.new("UICorner")
+			FillCorner.CornerRadius = UDim.new(0, 3)
+			FillCorner.Parent = Fill
+
+			local draggingSlider = false
+
+			local function updateValue(input)
+				local pos = UDim2.new(math.clamp((input.Position.X - SliderBar.AbsolutePosition.X) / SliderBar.AbsoluteSize.X, 0, 1), 0, 1, 0)
+				Fill.Size = pos
+				local val = math.floor(min + ((max - min) * pos.X.Scale))
+				ValueLabel.Text = tostring(val)
+				pcall(callback, val)
+			end
+
+			SliderBar.InputBegan:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+					draggingSlider = true
+					updateValue(input)
+				end
+			end)
+
+			UserInputService.InputEnded:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+					draggingSlider = false
+				end
+			end)
+
+			UserInputService.InputChanged:Connect(function(input)
+				if draggingSlider and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+					updateValue(input)
+				end
+			end)
+
+			return TabAPI
+		end
+
+		return TabAPI
 	end
 
 	return Window
