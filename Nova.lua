@@ -1,5 +1,5 @@
 --[[
-    NovaUI Library - Con RGB en Botón Minimizado y Pestaña Ajustes Automática
+    NovaUI Library - Con Botón Minimizado RGB, Ajustes Automáticos y Métricas en Vivo
 ]]
 
 local TweenService = game:GetService("TweenService")
@@ -325,7 +325,6 @@ function NovaUI:CreateWindow(config)
 	local Window = {}
 	local firstTab = true
 
-	-- Constructor de Pestañas
 	local function createTabInternal(tabName, isDefault)
 		local TabButton = Instance.new("TextButton")
 		TabButton.Size = UDim2.new(1, 0, 0, 28)
@@ -402,10 +401,11 @@ function NovaUI:CreateWindow(config)
 			BtnCorner.CornerRadius = UDim.new(0, 5)
 			BtnCorner.Parent = Btn
 
+			local SideLabel
 			if sideText then
-				local SideLabel = Instance.new("TextLabel")
-				SideLabel.Size = UDim2.new(0, 70, 1, 0)
-				SideLabel.Position = UDim2.new(1, -75, 0, 0)
+				SideLabel = Instance.new("TextLabel")
+				SideLabel.Size = UDim2.new(0, 100, 1, 0)
+				SideLabel.Position = UDim2.new(1, -105, 0, 0)
 				SideLabel.BackgroundTransparency = 1
 				SideLabel.Text = sideText
 				SideLabel.TextColor3 = Color3.fromRGB(130, 130, 160)
@@ -422,6 +422,8 @@ function NovaUI:CreateWindow(config)
 				task.wait(0.1)
 				tween(Btn, 0.1, {BackgroundColor3 = Color3.fromRGB(30, 30, 42)})
 			end)
+
+			return Btn, SideLabel
 		end
 
 		function TabAPI:AddToggle(text, default, callback)
@@ -621,36 +623,40 @@ function NovaUI:CreateWindow(config)
 		return TabAPI
 	end
 
-	-- Crear automáticamente la pestaña "Ajustes" predeterminada con estadísticas en vivo
+	-- Pestaña obligatoria y predeterminada "Ajustes" automatizada con métricas en vivo
 	local SettingsTab = createTabInternal("Ajustes", true)
 	SettingsTab:AddLabel("--- Información del Jugador ---")
 	
-	local UserLabel = SettingsTab:AddButton("Usuario: " .. LocalPlayer.Name, "Cuenta", function() end)
-	local PingLabel = SettingsTab:AddButton("Ping: ... ms", "Red", function() end)
-	local FpsLabel = SettingsTab:AddButton("FPS: ...", "Rendimiento", function() end)
+	local _, UserSide = SettingsTab:AddButton("Usuario: " .. LocalPlayer.Name, LocalPlayer.DisplayName, function() end)
+	local _, PingSide = SettingsTab:AddButton("Ping actual", "Calculando...", function() end)
+	local _, FpsSide = SettingsTab:AddButton("FPS actuales", "Calculando...", function() end)
 
-	-- Actualizador automático de Ping y FPS en tiempo real
+	-- Bucle para actualizar Ping y FPS en tiempo real
 	task.spawn(function()
-		while task.wait(1) do
-			pcall(function()
-				local pingValue = math.floor(LocalPlayer:GetNetworkPing() * 1000)
-				local fpsValue = math.floor(1 / RunService.RenderStepped:Wait())
-				-- Actualizar textos visuales de los botones de información
-				-- (Nota: se actualizan mediante re-instanciación ligera o texto interno)
-			end)
-		end
+		local lastUpdate = 0
+		RunService.RenderStepped:Connect(function(dt)
+			if tick() - lastUpdate >= 0.5 then
+				lastUpdate = tick()
+				pcall(function()
+					local ping = math.floor(LocalPlayer:GetNetworkPing() * 1000)
+					local fps = math.floor(1 / dt)
+					if PingSide then PingSide.Text = ping .. " ms" end
+					if FpsSide then FpsSide.Text = tostring(fps) end
+				end)
+			end
+		end)
 	end)
 
-	SettingsTab:AddLabel("--- Apariencia de la GUI ---")
-	SettingsTab:AddButton("Tema Oscuro (Por defecto)", "Tema", function()
+	SettingsTab:AddLabel("--- Personalización de Temas ---")
+	SettingsTab:AddButton("Tema Oscuro (Estándar)", "Aplicar", function()
 		MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
 		TopBar.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
 	end)
-	SettingsTab:AddButton("Tema Azul Oscuro", "Tema", function()
+	SettingsTab:AddButton("Tema Azul Nocturno", "Aplicar", function()
 		MainFrame.BackgroundColor3 = Color3.fromRGB(15, 22, 36)
 		TopBar.BackgroundColor3 = Color3.fromRGB(20, 30, 48)
 	end)
-	SettingsTab:AddButton("Tema Gris Minimalista", "Tema", function()
+	SettingsTab:AddButton("Tema Gris Minimalista", "Aplicar", function()
 		MainFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
 		TopBar.BackgroundColor3 = Color3.fromRGB(38, 38, 38)
 	end)
