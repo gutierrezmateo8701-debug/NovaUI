@@ -1,5 +1,5 @@
 --[[
-    NovaUI Library - Sintaxis personalizada con Subtítulo y Key System
+    NovaUI Library - Compacta, Corregida y Ampliada
 ]]
 
 local TweenService = game:GetService("TweenService")
@@ -49,27 +49,27 @@ function NovaUI:CreateWindow(config)
 		ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 	end
 
-	-- Botón flotante minimizado ("UI" con borde RGB)
+	-- Botón flotante minimizado
 	local MiniButton = Instance.new("TextButton")
 	MiniButton.Name = "MiniButton"
-	MiniButton.Size = UDim2.new(0, 50, 0, 50)
-	MiniButton.Position = UDim2.new(0, 20, 0.5, -25)
+	MiniButton.Size = UDim2.new(0, 45, 0, 45)
+	MiniButton.Position = UDim2.new(0, 15, 0.5, -22)
 	MiniButton.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 	MiniButton.Text = "UI"
 	MiniButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-	MiniButton.TextSize = 16
+	MiniButton.TextSize = 14
 	MiniButton.Font = Enum.Font.GothamBold
 	MiniButton.Visible = false
 	MiniButton.ZIndex = 100
 	MiniButton.Parent = ScreenGui
 
 	local MiniCorner = Instance.new("UICorner")
-	MiniCorner.CornerRadius = UDim.new(0, 12)
+	MiniCorner.CornerRadius = UDim.new(0, 10)
 	MiniCorner.Parent = MiniButton
 
 	local MiniStroke = Instance.new("UIStroke")
 	MiniStroke.Color = Color3.fromRGB(255, 255, 255)
-	MiniStroke.Thickness = 2.5
+	MiniStroke.Thickness = 2
 	MiniStroke.Parent = MiniButton
 
 	task.spawn(function()
@@ -82,11 +82,11 @@ function NovaUI:CreateWindow(config)
 		end
 	end)
 
-	-- Ventana Principal (Gui acostada / Ancha: 580x340)
+	-- Ventana Principal Reducida (Más compacta: 480x280)
 	local MainFrame = Instance.new("Frame")
 	MainFrame.Name = "MainFrame"
-	MainFrame.Size = UDim2.new(0, 580, 0, 340)
-	MainFrame.Position = UDim2.new(0.5, -290, 0.5, -170)
+	MainFrame.Size = UDim2.new(0, 480, 0, 280)
+	MainFrame.Position = UDim2.new(0.5, -240, 0.5, -140)
 	MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
 	MainFrame.BorderSizePixel = 0
 	MainFrame.ClipsDescendants = true
@@ -102,10 +102,10 @@ function NovaUI:CreateWindow(config)
 	MainStroke.Thickness = 1.5
 	MainStroke.Parent = MainFrame
 
-	-- Barra Superior (Topbar)
+	-- Barra Superior
 	local TopBar = Instance.new("Frame")
 	TopBar.Name = "TopBar"
-	TopBar.Size = UDim2.new(1, 0, 0, 45)
+	TopBar.Size = UDim2.new(1, 0, 0, 38)
 	TopBar.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
 	TopBar.BorderSizePixel = 0
 	TopBar.ZIndex = 11
@@ -116,21 +116,21 @@ function NovaUI:CreateWindow(config)
 	TopBarCorner.Parent = TopBar
 
 	local FixFrame = Instance.new("Frame")
-	FixFrame.Size = UDim2.new(1, 0, 0, 10)
-	FixFrame.Position = UDim2.new(0, 0, 1, -10)
+	FixFrame.Size = UDim2.new(1, 0, 0, 8)
+	FixFrame.Position = UDim2.new(0, 0, 1, -8)
 	FixFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
 	FixFrame.BorderSizePixel = 0
 	FixFrame.ZIndex = 11
 	FixFrame.Parent = TopBar
 
-	-- Título principal
+	-- Título
 	local Title = Instance.new("TextLabel")
-	Title.Size = UDim2.new(0, 300, 0, 20)
-	Title.Position = UDim2.new(0, 55, 0, 4)
+	Title.Size = UDim2.new(0, 250, 0, 16)
+	Title.Position = UDim2.new(0, 45, 0, 3)
 	Title.BackgroundTransparency = 1
 	Title.Text = titleText
 	Title.TextColor3 = Color3.fromRGB(240, 240, 255)
-	Title.TextSize = 13
+	Title.TextSize = 12
 	Title.Font = Enum.Font.GothamBold
 	Title.TextXAlignment = Enum.TextXAlignment.Left
 	Title.ZIndex = 12
@@ -138,53 +138,53 @@ function NovaUI:CreateWindow(config)
 
 	-- Subtítulo exactamente debajo del nombre
 	local SubtitleLabel = Instance.new("TextLabel")
-	SubtitleLabel.Size = UDim2.new(0, 300, 0, 16)
-	SubtitleLabel.Position = UDim2.new(0, 55, 0, 22)
+	SubtitleLabel.Size = UDim2.new(0, 250, 0, 14)
+	SubtitleLabel.Position = UDim2.new(0, 45, 0, 19)
 	SubtitleLabel.BackgroundTransparency = 1
 	SubtitleLabel.Text = subtitleText
 	SubtitleLabel.TextColor3 = Color3.fromRGB(150, 150, 180)
-	SubtitleLabel.TextSize = 10
+	SubtitleLabel.TextSize = 9
 	SubtitleLabel.Font = Enum.Font.Gotham
 	SubtitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 	SubtitleLabel.ZIndex = 12
 	SubtitleLabel.Parent = TopBar
 
-	-- Botón Minimizar "UI" (Izquierda)
+	-- Botón Minimizar "UI"
 	local MinimizeBtn = Instance.new("TextButton")
-	MinimizeBtn.Size = UDim2.new(0, 35, 0, 28)
-	MinimizeBtn.Position = UDim2.new(0, 10, 0.5, -14)
+	MinimizeBtn.Size = UDim2.new(0, 30, 0, 24)
+	MinimizeBtn.Position = UDim2.new(0, 8, 0.5, -12)
 	MinimizeBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 55)
 	MinimizeBtn.Text = "UI"
 	MinimizeBtn.TextColor3 = Color3.fromRGB(200, 200, 220)
-	MinimizeBtn.TextSize = 12
+	MinimizeBtn.TextSize = 11
 	MinimizeBtn.Font = Enum.Font.GothamBold
 	MinimizeBtn.ZIndex = 12
 	MinimizeBtn.Parent = TopBar
 
 	local MinCorner = Instance.new("UICorner")
-	MinCorner.CornerRadius = UDim.new(0, 6)
+	MinCorner.CornerRadius = UDim.new(0, 5)
 	MinCorner.Parent = MinimizeBtn
 
-	-- Botón Eliminar / Cerrar (Derecha)
+	-- Botón Cerrar (X)
 	local CloseBtn = Instance.new("TextButton")
-	CloseBtn.Size = UDim2.new(0, 26, 0, 26)
-	CloseBtn.Position = UDim2.new(1, -35, 0.5, -13)
+	CloseBtn.Size = UDim2.new(0, 22, 0, 22)
+	CloseBtn.Position = UDim2.new(1, -28, 0.5, -11)
 	CloseBtn.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
 	CloseBtn.Text = "X"
 	CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-	CloseBtn.TextSize = 12
+	CloseBtn.TextSize = 11
 	CloseBtn.Font = Enum.Font.GothamBold
 	CloseBtn.ZIndex = 12
 	CloseBtn.Parent = TopBar
 
 	local CloseCorner = Instance.new("UICorner")
-	CloseCorner.CornerRadius = UDim.new(0, 6)
+	CloseCorner.CornerRadius = UDim.new(0, 5)
 	CloseCorner.Parent = CloseBtn
 
-	-- Contenedor de Pestañas (Lateral Izquierdo)
+	-- Contenedor de Pestañas Izquierdas
 	local TabContainer = Instance.new("ScrollingFrame")
-	TabContainer.Size = UDim2.new(0, 130, 1, -60)
-	TabContainer.Position = UDim2.new(0, 10, 0, 50)
+	TabContainer.Size = UDim2.new(0, 115, 1, -48)
+	TabContainer.Position = UDim2.new(0, 8, 0, 42)
 	TabContainer.BackgroundTransparency = 1
 	TabContainer.BorderSizePixel = 0
 	TabContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
@@ -194,7 +194,7 @@ function NovaUI:CreateWindow(config)
 
 	local TabList = Instance.new("UIListLayout")
 	TabList.SortOrder = Enum.SortOrder.LayoutOrder
-	TabList.Padding = UDim.new(0, 6)
+	TabList.Padding = UDim.new(0, 5)
 	TabList.Parent = TabContainer
 
 	TabList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
@@ -205,7 +205,7 @@ function NovaUI:CreateWindow(config)
 	PagesFolder.Name = "PagesFolder"
 	PagesFolder.Parent = MainFrame
 
-	-- Sistema de Arrastre
+	-- Arrastre de Pantalla
 	local dragging, dragInput, dragStart, startPos
 	TopBar.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -244,30 +244,26 @@ function NovaUI:CreateWindow(config)
 		else
 			MiniButton.Visible = false
 			MainFrame.Visible = true
-			tween(MainFrame, 0.3, {Size = UDim2.new(0, 580, 0, 340)})
+			tween(MainFrame, 0.3, {Size = UDim2.new(0, 480, 0, 280)})
 		end
 	end
 
 	MinimizeBtn.MouseButton1Click:Connect(toggleMinimize)
 	MiniButton.MouseButton1Click:Connect(toggleMinimize)
+	CloseBtn.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
 
-	CloseBtn.MouseButton1Click:Connect(function()
-		ScreenGui:Destroy()
-	end)
-
-	-- Manejo del Key System automático
+	-- Key System
 	if useKeySystem then
 		MainFrame.Visible = false
-
 		local KeyFrame = Instance.new("Frame")
-		KeyFrame.Size = UDim2.new(0, 380, 0, 220)
-		KeyFrame.Position = UDim2.new(0.5, -190, 0.5, -110)
+		KeyFrame.Size = UDim2.new(0, 320, 0, 180)
+		KeyFrame.Position = UDim2.new(0.5, -160, 0.5, -90)
 		KeyFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
 		KeyFrame.ZIndex = 50
 		KeyFrame.Parent = ScreenGui
 
 		local KeyCorner = Instance.new("UICorner")
-		KeyCorner.CornerRadius = UDim.new(0, 10)
+		KeyCorner.CornerRadius = UDim.new(0, 8)
 		KeyCorner.Parent = KeyFrame
 
 		local KeyStroke = Instance.new("UIStroke")
@@ -276,58 +272,46 @@ function NovaUI:CreateWindow(config)
 		KeyStroke.Parent = KeyFrame
 
 		local KeyTitle = Instance.new("TextLabel")
-		KeyTitle.Size = UDim2.new(1, 0, 0, 40)
-		KeyTitle.Position = UDim2.new(0, 0, 0, 10)
+		KeyTitle.Size = UDim2.new(1, 0, 0, 30)
+		KeyTitle.Position = UDim2.new(0, 0, 0, 8)
 		KeyTitle.BackgroundTransparency = 1
-		KeyTitle.Text = titleText .. " - Key System"
+		KeyTitle.Text = titleText .. " - Key"
 		KeyTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-		KeyTitle.TextSize = 16
+		KeyTitle.TextSize = 14
 		KeyTitle.Font = Enum.Font.GothamBold
 		KeyTitle.ZIndex = 51
 		KeyTitle.Parent = KeyFrame
 
-		local KeyDesc = Instance.new("TextLabel")
-		KeyDesc.Size = UDim2.new(1, -40, 0, 30)
-		KeyDesc.Position = UDim2.new(0, 20, 0, 55)
-		KeyDesc.BackgroundTransparency = 1
-		KeyDesc.Text = "Introduce la llave correcta para continuar."
-		KeyDesc.TextColor3 = Color3.fromRGB(160, 160, 180)
-		KeyDesc.TextSize = 12
-		KeyDesc.Font = Enum.Font.Gotham
-		KeyDesc.TextWrapped = true
-		KeyDesc.ZIndex = 51
-		KeyDesc.Parent = KeyFrame
-
 		local KeyBox = Instance.new("TextBox")
-		KeyBox.Size = UDim2.new(1, -40, 0, 35)
-		KeyBox.Position = UDim2.new(0, 20, 0, 100)
+		KeyBox.Size = UDim2.new(1, -30, 0, 30)
+		KeyBox.Position = UDim2.new(0, 15, 0, 60)
 		KeyBox.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
 		KeyBox.Text = ""
-		KeyBox.PlaceholderText = "Escribe tu llave aquí..."
+		KeyBox.PlaceholderText = "Escribe tu llave..."
 		KeyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 		KeyBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 150)
-		KeyBox.TextSize = 13
+		KeyBox.TextSize = 12
 		KeyBox.Font = Enum.Font.Gotham
 		KeyBox.ZIndex = 51
 		KeyBox.Parent = KeyFrame
 
 		local BoxCorner = Instance.new("UICorner")
-		BoxCorner.CornerRadius = UDim.new(0, 6)
+		BoxCorner.CornerRadius = UDim.new(0, 5)
 		BoxCorner.Parent = KeyBox
 
 		local VerifyBtn = Instance.new("TextButton")
-		VerifyBtn.Size = UDim2.new(1, -40, 0, 35)
-		VerifyBtn.Position = UDim2.new(0, 20, 0, 150)
+		VerifyBtn.Size = UDim2.new(1, -30, 0, 30)
+		VerifyBtn.Position = UDim2.new(0, 15, 0, 110)
 		VerifyBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 200)
-		VerifyBtn.Text = "Verificar Llave"
+		VerifyBtn.Text = "Verificar"
 		VerifyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-		VerifyBtn.TextSize = 13
+		VerifyBtn.TextSize = 12
 		VerifyBtn.Font = Enum.Font.GothamBold
 		VerifyBtn.ZIndex = 51
 		VerifyBtn.Parent = KeyFrame
 
 		local BtnCorner = Instance.new("UICorner")
-		BtnCorner.CornerRadius = UDim.new(0, 6)
+		BtnCorner.CornerRadius = UDim.new(0, 5)
 		BtnCorner.Parent = VerifyBtn
 
 		VerifyBtn.MouseButton1Click:Connect(function()
@@ -336,7 +320,7 @@ function NovaUI:CreateWindow(config)
 				MainFrame.Visible = true
 			else
 				KeyBox.Text = ""
-				KeyBox.PlaceholderText = "¡Llave incorrecta!"
+				KeyBox.PlaceholderText = "¡Incorrecta!"
 			end
 		end)
 	end
@@ -346,34 +330,34 @@ function NovaUI:CreateWindow(config)
 
 	function Window:AddTab(tabName)
 		local TabButton = Instance.new("TextButton")
-		TabButton.Size = UDim2.new(1, 0, 0, 32)
+		TabButton.Size = UDim2.new(1, 0, 0, 28)
 		TabButton.BackgroundColor3 = Color3.fromRGB(28, 28, 38)
 		TabButton.Text = "  " .. tabName
 		TabButton.TextColor3 = Color3.fromRGB(160, 160, 180)
-		TabButton.TextSize = 12
+		TabButton.TextSize = 11
 		TabButton.Font = Enum.Font.GothamMedium
 		TabButton.TextXAlignment = Enum.TextXAlignment.Left
 		TabButton.ZIndex = 11
 		TabButton.Parent = TabContainer
 
 		local TabCorner = Instance.new("UICorner")
-		TabCorner.CornerRadius = UDim.new(0, 6)
+		TabCorner.CornerRadius = UDim.new(0, 5)
 		TabCorner.Parent = TabButton
 
 		local Page = Instance.new("ScrollingFrame")
-		Page.Size = UDim2.new(1, -155, 1, -60)
-		Page.Position = UDim2.new(0, 150, 0, 50)
+		Page.Size = UDim2.new(1, -135, 1, -48)
+		Page.Position = UDim2.new(0, 128, 0, 42)
 		Page.BackgroundTransparency = 1
 		Page.BorderSizePixel = 0
 		Page.CanvasSize = UDim2.new(0, 0, 0, 0)
-		Page.ScrollBarThickness = 4
+		Page.ScrollBarThickness = 3
 		Page.Visible = false
 		Page.ZIndex = 11
-		Page.Parent = MainFrame
+		Page.Parent = PagesFolder
 
 		local PageList = Instance.new("UIListLayout")
 		PageList.SortOrder = Enum.SortOrder.LayoutOrder
-		PageList.Padding = UDim.new(0, 8)
+		PageList.Padding = UDim.new(0, 6)
 		PageList.Parent = Page
 
 		PageList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
@@ -410,28 +394,28 @@ function NovaUI:CreateWindow(config)
 
 		function TabAPI:AddButton(text, sideText, callback)
 			local Btn = Instance.new("TextButton")
-			Btn.Size = UDim2.new(1, 0, 0, 35)
+			Btn.Size = UDim2.new(1, 0, 0, 30)
 			Btn.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
 			Btn.Text = "  " .. text
 			Btn.TextColor3 = Color3.fromRGB(220, 220, 240)
-			Btn.TextSize = 13
+			Btn.TextSize = 12
 			Btn.Font = Enum.Font.Gotham
 			Btn.TextXAlignment = Enum.TextXAlignment.Left
 			Btn.ZIndex = 11
 			Btn.Parent = Page
 
 			local BtnCorner = Instance.new("UICorner")
-			BtnCorner.CornerRadius = UDim.new(0, 6)
+			BtnCorner.CornerRadius = UDim.new(0, 5)
 			BtnCorner.Parent = Btn
 
 			if sideText then
 				local SideLabel = Instance.new("TextLabel")
-				SideLabel.Size = UDim2.new(0, 80, 1, 0)
-				SideLabel.Position = UDim2.new(1, -85, 0, 0)
+				SideLabel.Size = UDim2.new(0, 70, 1, 0)
+				SideLabel.Position = UDim2.new(1, -75, 0, 0)
 				SideLabel.BackgroundTransparency = 1
 				SideLabel.Text = sideText
 				SideLabel.TextColor3 = Color3.fromRGB(130, 130, 160)
-				SideLabel.TextSize = 11
+				SideLabel.TextSize = 10
 				SideLabel.Font = Enum.Font.GothamBold
 				SideLabel.TextXAlignment = Enum.TextXAlignment.Right
 				SideLabel.ZIndex = 12
@@ -451,35 +435,35 @@ function NovaUI:CreateWindow(config)
 			local toggled = default
 
 			local ToggleBtn = Instance.new("TextButton")
-			ToggleBtn.Size = UDim2.new(1, 0, 0, 35)
+			ToggleBtn.Size = UDim2.new(1, 0, 0, 30)
 			ToggleBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
 			ToggleBtn.Text = "  " .. text
 			ToggleBtn.TextColor3 = Color3.fromRGB(220, 220, 240)
-			ToggleBtn.TextSize = 13
+			ToggleBtn.TextSize = 12
 			ToggleBtn.Font = Enum.Font.Gotham
 			ToggleBtn.TextXAlignment = Enum.TextXAlignment.Left
 			ToggleBtn.ZIndex = 11
 			ToggleBtn.Parent = Page
 
 			local Corner = Instance.new("UICorner")
-			Corner.CornerRadius = UDim.new(0, 6)
+			Corner.CornerRadius = UDim.new(0, 5)
 			Corner.Parent = ToggleBtn
 
 			local Switch = Instance.new("Frame")
-			Switch.Size = UDim2.new(0, 40, 0, 20)
-			Switch.Position = UDim2.new(1, -48, 0.5, -10)
+			Switch.Size = UDim2.new(0, 36, 0, 18)
+			Switch.Position = UDim2.new(1, -44, 0.5, -9)
 			Switch.BackgroundColor3 = toggled and Color3.fromRGB(100, 100, 220) or Color3.fromRGB(45, 45, 65)
 			Switch.BorderSizePixel = 0
 			Switch.ZIndex = 12
 			Switch.Parent = ToggleBtn
 
 			local SwitchCorner = Instance.new("UICorner")
-			SwitchCorner.CornerRadius = UDim.new(0, 10)
+			SwitchCorner.CornerRadius = UDim.new(0, 9)
 			SwitchCorner.Parent = Switch
 
 			local Circle = Instance.new("Frame")
-			Circle.Size = UDim2.new(0, 16, 0, 16)
-			Circle.Position = toggled and UDim2.new(1, -18, 0.5, -8) or UDim2.new(0, 2, 0.5, -8)
+			Circle.Size = UDim2.new(0, 14, 0, 14)
+			Circle.Position = toggled and UDim2.new(1, -16, 0.5, -7) or UDim2.new(0, 2, 0.5, -7)
 			Circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			Circle.BorderSizePixel = 0
 			Circle.ZIndex = 13
@@ -492,11 +476,10 @@ function NovaUI:CreateWindow(config)
 			ToggleBtn.MouseButton1Click:Connect(function()
 				toggled = not toggled
 				local goalSwitchColor = toggled and Color3.fromRGB(100, 100, 220) or Color3.fromRGB(45, 45, 65)
-				local goalCirclePos = toggled and UDim2.new(1, -18, 0.5, -8) or UDim2.new(0, 2, 0.5, -8)
+				local goalCirclePos = toggled and UDim2.new(1, -16, 0.5, -7) or UDim2.new(0, 2, 0.5, -7)
 				
 				tween(Switch, 0.2, {BackgroundColor3 = goalSwitchColor})
 				tween(Circle, 0.2, {Position = goalCirclePos})
-				
 				pcall(callback, toggled)
 			end)
 		end
@@ -507,49 +490,49 @@ function NovaUI:CreateWindow(config)
 			default = default or min
 
 			local SliderFrame = Instance.new("Frame")
-			SliderFrame.Size = UDim2.new(1, 0, 0, 50)
+			SliderFrame.Size = UDim2.new(1, 0, 0, 42)
 			SliderFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
 			SliderFrame.ZIndex = 11
 			SliderFrame.Parent = Page
 
 			local SliderCorner = Instance.new("UICorner")
-			SliderCorner.CornerRadius = UDim.new(0, 6)
+			SliderCorner.CornerRadius = UDim.new(0, 5)
 			SliderCorner.Parent = SliderFrame
 
 			local Label = Instance.new("TextLabel")
-			Label.Size = UDim2.new(1, -20, 0, 22)
-			Label.Position = UDim2.new(0, 10, 0, 4)
+			Label.Size = UDim2.new(1, -20, 0, 18)
+			Label.Position = UDim2.new(0, 8, 0, 3)
 			Label.BackgroundTransparency = 1
 			Label.Text = text
 			Label.TextColor3 = Color3.fromRGB(220, 220, 240)
-			Label.TextSize = 12
+			Label.TextSize = 11
 			Label.Font = Enum.Font.Gotham
 			Label.TextXAlignment = Enum.TextXAlignment.Left
 			Label.ZIndex = 12
 			Label.Parent = SliderFrame
 
 			local ValueLabel = Instance.new("TextLabel")
-			ValueLabel.Size = UDim2.new(0, 50, 0, 22)
-			ValueLabel.Position = UDim2.new(1, -60, 0, 4)
+			ValueLabel.Size = UDim2.new(0, 45, 0, 18)
+			ValueLabel.Position = UDim2.new(1, -52, 0, 3)
 			ValueLabel.BackgroundTransparency = 1
 			ValueLabel.Text = tostring(default)
 			ValueLabel.TextColor3 = Color3.fromRGB(150, 150, 180)
-			ValueLabel.TextSize = 12
+			ValueLabel.TextSize = 11
 			ValueLabel.Font = Enum.Font.GothamBold
 			ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
 			ValueLabel.ZIndex = 12
 			ValueLabel.Parent = SliderFrame
 
 			local SliderBar = Instance.new("Frame")
-			SliderBar.Size = UDim2.new(1, -20, 0, 6)
-			SliderBar.Position = UDim2.new(0, 10, 0, 32)
+			SliderBar.Size = UDim2.new(1, -16, 0, 5)
+			SliderBar.Position = UDim2.new(0, 8, 0, 26)
 			SliderBar.BackgroundColor3 = Color3.fromRGB(45, 45, 65)
 			SliderBar.BorderSizePixel = 0
 			SliderBar.ZIndex = 12
 			SliderBar.Parent = SliderFrame
 
 			local BarCorner = Instance.new("UICorner")
-			BarCorner.CornerRadius = UDim.new(0, 3)
+			BarCorner.CornerRadius = UDim.new(0, 2)
 			BarCorner.Parent = SliderBar
 
 			local Fill = Instance.new("Frame")
@@ -560,11 +543,10 @@ function NovaUI:CreateWindow(config)
 			Fill.Parent = SliderBar
 
 			local FillCorner = Instance.new("UICorner")
-			FillCorner.CornerRadius = UDim.new(0, 3)
+			FillCorner.CornerRadius = UDim.new(0, 2)
 			FillCorner.Parent = Fill
 
 			local draggingSlider = false
-
 			local function updateValue(input)
 				local pos = UDim2.new(math.clamp((input.Position.X - SliderBar.AbsolutePosition.X) / SliderBar.AbsoluteSize.X, 0, 1), 0, 1, 0)
 				Fill.Size = pos
@@ -579,13 +561,11 @@ function NovaUI:CreateWindow(config)
 					updateValue(input)
 				end
 			end)
-
 			UserInputService.InputEnded:Connect(function(input)
 				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 					draggingSlider = false
 				end
 			end)
-
 			UserInputService.InputChanged:Connect(function(input)
 				if draggingSlider and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
 					updateValue(input)
@@ -593,17 +573,128 @@ function NovaUI:CreateWindow(config)
 			end)
 		end
 
+		-- NUEVA FUNCIÓN: AddLabel
 		function TabAPI:AddLabel(text)
 			local Label = Instance.new("TextLabel")
-			Label.Size = UDim2.new(1, 0, 0, 25)
+			Label.Size = UDim2.new(1, 0, 0, 20)
 			Label.BackgroundTransparency = 1
-			Label.Text = "  " + text
+			Label.Text = "  " .. text
 			Label.TextColor3 = Color3.fromRGB(150, 150, 180)
-			Label.TextSize = 12
+			Label.TextSize = 11
 			Label.Font = Enum.Font.GothamBold
 			Label.TextXAlignment = Enum.TextXAlignment.Left
 			Label.ZIndex = 11
 			Label.Parent = Page
+		end
+
+		-- NUEVA FUNCIÓN: AddTextbox
+		function TabAPI:AddTextbox(text, placeholder, callback)
+			local TextboxFrame = Instance.new("Frame")
+			TextboxFrame.Size = UDim2.new(1, 0, 0, 35)
+			TextboxFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
+			TextboxFrame.ZIndex = 11
+			TextboxFrame.Parent = Page
+
+			local FrameCorner = Instance.new("UICorner")
+			FrameCorner.CornerRadius = UDim.new(0, 5)
+			FrameCorner.Parent = TextboxFrame
+
+			local Label = Instance.new("TextLabel")
+			Label.Size = UDim2.new(0, 120, 1, 0)
+			Label.Position = UDim2.new(0, 8, 0, 0)
+			Label.BackgroundTransparency = 1
+			Label.Text = text
+			Label.TextColor3 = Color3.fromRGB(220, 220, 240)
+			Label.TextSize = 11
+			Label.Font = Enum.Font.Gotham
+			Label.TextXAlignment = Enum.TextXAlignment.Left
+			Label.ZIndex = 12
+			Label.Parent = TextboxFrame
+
+			local Box = Instance.new("TextBox")
+			Box.Size = UDim2.new(0, 140, 0, 24)
+			Box.Position = UDim2.new(1, -148, 0.5, -12)
+			Box.BackgroundColor3 = Color3.fromRGB(40, 40, 55)
+			Box.Text = ""
+			Box.PlaceholderText = placeholder or "Escribe..."
+			Box.TextColor3 = Color3.fromRGB(255, 255, 255)
+			Box.PlaceholderColor3 = Color3.fromRGB(130, 130, 160)
+			Box.TextSize = 11
+			Box.Font = Enum.Font.Gotham
+			Box.ZIndex = 12
+			Box.Parent = TextboxFrame
+
+			local BoxCorner = Instance.new("UICorner")
+			BoxCorner.CornerRadius = UDim.new(0, 4)
+			BoxCorner.Parent = Box
+
+			Box.FocusLost:Connect(function(enterPressed)
+				pcall(callback, Box.Text)
+			end)
+		end
+
+		-- NUEVA FUNCIÓN: AddDropdown
+		function TabAPI:AddDropdown(text, list, callback)
+			local opened = false
+			local DropMain = Instance.new("Frame")
+			DropMain.Size = UDim2.new(1, 0, 0, 30)
+			DropMain.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
+			DropMain.ClipsDescendants = true
+			DropMain.ZIndex = 11
+			DropMain.Parent = Page
+
+			local DropCorner = Instance.new("UICorner")
+			DropCorner.CornerRadius = UDim.new(0, 5)
+			DropCorner.Parent = DropMain
+
+			local DropBtn = Instance.new("TextButton")
+			DropBtn.Size = UDim2.new(1, 0, 0, 30)
+			DropBtn.BackgroundTransparency = 1
+			DropBtn.Text = "  " .. text .. " : Seleccionar"
+			DropBtn.TextColor3 = Color3.fromRGB(220, 220, 240)
+			DropBtn.TextSize = 11
+			DropBtn.Font = Enum.Font.Gotham
+			DropBtn.TextXAlignment = Enum.TextXAlignment.Left
+			DropBtn.ZIndex = 12
+			DropBtn.Parent = DropMain
+
+			local DropList = Instance.new("UIListLayout")
+			DropList.SortOrder = Enum.SortOrder.LayoutOrder
+			DropList.Parent = DropMain
+
+			local function rebuildList()
+				for _, child in pairs(DropMain:GetChildren()) do
+					if child:IsA("TextButton") and child ~= DropBtn then
+						child:Destroy()
+					end
+				end
+				for _, option in ipairs(list) do
+					local OptBtn = Instance.new("TextButton")
+					OptBtn.Size = UDim2.new(1, 0, 0, 26)
+					OptBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
+					OptBtn.Text = "    • " .. tostring(option)
+					OptBtn.TextColor3 = Color3.fromRGB(180, 180, 200)
+					OptBtn.TextSize = 11
+					OptBtn.Font = Enum.Font.Gotham
+					OptBtn.TextXAlignment = Enum.TextXAlignment.Left
+					OptBtn.ZIndex = 12
+					OptBtn.Parent = DropMain
+
+					OptBtn.MouseButton1Click:Connect(function()
+						opened = false
+						DropBtn.Text = "  " .. text .. " : " .. tostring(option)
+						tween(DropMain, 0.2, {Size = UDim2.new(1, 0, 0, 30)})
+						pcall(callback, option)
+					end)
+				end
+			end
+			rebuildList()
+
+			DropBtn.MouseButton1Click:Connect(function()
+				opened = not opened
+				local targetHeight = opened and (30 + (#list * 26)) or 30
+				tween(DropMain, 0.2, {Size = UDim2.new(1, 0, 0, targetHeight)})
+			end)
 		end
 
 		return TabAPI
